@@ -62,14 +62,18 @@
     </div>
 </div>
 <style>
+    /* Estilo para telas maiores */
+    .exibir_conteudo {
+        padding: 10rem;
+    }
+
+    /* Estilo para telas pequenas (máximo de 767px) */
     @media (max-width: 767px) {
-        .exibir_conteudo{
-    padding-top: 6rem;
-    padding-bottom: 6rem;
-}
-}
-.exibir_conteudo{
-    padding: 10rem;
-  
+        .exibir_conteudo {
+            padding-top: 6rem;
+            padding-bottom: 6rem;
+        }
+    }
 </style>
+
 @endsection
