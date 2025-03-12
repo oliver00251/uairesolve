@@ -36,5 +36,13 @@
     Você precisa estar logado para registrar uma ocorrência. <br>
     <a href="{{ route('login') }}" class="btn btn-primary mt-2">Fazer Login</a>
 </div>
+<style>
+    @media (max-width: 767px) {
+    .alert {
+        padding-top: 12rem !important;
+    }
+}
+
+</style>
 @endauth
 @endsection
