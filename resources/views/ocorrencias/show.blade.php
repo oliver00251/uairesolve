@@ -3,15 +3,15 @@
 @section('content')
 <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+        <div class="col-12 col-md-8 col-lg-6">
             {{-- Card de Ocorrência --}}
             <div class="card shadow-sm p-4">
                 {{-- Ícone de voltar --}}
                 <div class="d-flex align-items-center mb-3">
                     <a href="{{ route('ocorrencias.index') }}" class="text-decoration-none text-dark">
-                        <i class="fas fa-arrow-left fa-lg"></i> 
+                        <i class="fas fa-arrow-left fa-lg"></i>
                     </a>
-                    <h2 class="ms-2 mb-0">Detalhes da Ocorrência</h2>
+                    <h2 class="ms-2 mb-0 fs-4 fs-md-3">Detalhes da Ocorrência</h2>
                 </div>
 
                 {{-- Detalhes da ocorrência --}}
