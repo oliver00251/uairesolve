@@ -32,7 +32,7 @@
     </form>
 </div>
 @else
-<div class="alert alert-warning text-center mt-4">
+<div class="alert alert-warning text-center mt-4 min-vh-100">
     Você precisa estar logado para registrar uma ocorrência. <br>
     <a href="{{ route('login') }}" class="btn btn-primary mt-2">Fazer Login</a>
 </div>
