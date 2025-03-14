@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UaiResolve</title>
+    <title>UaiResolve - Nossa cidade, nosso compromisso</title>
+    <meta name="description" content="Juntos, podemos melhorar nossa cidade! Registre ocorrências e colabore para um ambiente melhor.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="UaiResolve - Nossa cidade, nosso compromisso">
+    <meta property="og:description" content="Juntos, podemos melhorar nossa cidade! Registre ocorrências e colabore para um ambiente melhor.">
+    <meta property="og:image" content="{{ asset('images/preview.png') }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="UaiResolve - Nossa cidade, nosso compromisso">
+    <meta name="twitter:description" content="Juntos, podemos melhorar nossa cidade! Registre ocorrências e colabore para um ambiente melhor.">
+    <meta name="twitter:image" content="{{ asset('images/preview.png') }}">
 
     <!-- Link do Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,8 +33,8 @@
 
     <!-- Manifesto -->
     <link rel="manifest" href="/manifest.json">
-
 </head>
+
 <body>
     <div class="">
       @include('layouts.nav')
