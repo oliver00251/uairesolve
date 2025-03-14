@@ -17,7 +17,9 @@
     <!-- DataTables CSS -->
     <link href="https://cdn.jsdelivr.net/npm/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
 
-    <!-- Chart.js CSS (não é necessário, pois Chart.js é uma biblioteca JS) -->
+    <!-- Manifesto -->
+    <link rel="manifest" href="/manifest.json">
+
 </head>
 <body>
     <div class="">
@@ -69,14 +71,18 @@
             installButton.innerText = 'Instale nosso app';
             installButton.style.position = 'fixed';
             installButton.style.bottom = '20px';
-            installButton.style.left = '20px';
+            installButton.style.right = '20px';
             installButton.style.zIndex = '1000';
-            installButton.style.padding = '10px 20px';
-            installButton.style.backgroundColor = '#343a40';
+            installButton.style.padding = '12px 20px';
+            installButton.style.backgroundColor = '#618CC7';  // Cor azul da sua paleta
             installButton.style.color = '#ffffff';
             installButton.style.border = 'none';
-            installButton.style.borderRadius = '5px';
+            installButton.style.borderRadius = '8px';
             installButton.style.cursor = 'pointer';
+            installButton.style.fontSize = '16px';
+
+            // Adicionar o botão à tela
+            document.body.appendChild(installButton);
 
             installButton.addEventListener('click', () => {
                 installButton.style.display = 'none';
@@ -90,8 +96,6 @@
                     deferredPrompt = null;
                 });
             });
-
-            document.body.appendChild(installButton);
         }
     </script>
 </body>
