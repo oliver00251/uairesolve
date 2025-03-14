@@ -42,5 +42,57 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     @yield('scripts') <!-- Scripts específicos da página -->
+    
+    <!-- Registrar o Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                console.log('Service Worker registrado com sucesso:', registration.scope);
+            }).catch(function(error) {
+                console.log('Falha ao registrar o Service Worker:', error);
+            });
+        }
+    </script>
+
+    <!-- Mostrar o prompt de instalação do PWA -->
+    <script>
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallPromotion();
+        });
+
+        function showInstallPromotion() {
+            const installButton = document.createElement('button');
+            installButton.innerText = 'Instale nosso app';
+            installButton.style.position = 'fixed';
+            installButton.style.bottom = '20px';
+            installButton.style.left = '20px';
+            installButton.style.zIndex = '1000';
+            installButton.style.padding = '10px 20px';
+            installButton.style.backgroundColor = '#343a40';
+            installButton.style.color = '#ffffff';
+            installButton.style.border = 'none';
+            installButton.style.borderRadius = '5px';
+            installButton.style.cursor = 'pointer';
+
+            installButton.addEventListener('click', () => {
+                installButton.style.display = 'none';
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Usuário aceitou o prompt de instalação');
+                    } else {
+                        console.log('Usuário rejeitou o prompt de instalação');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+
+            document.body.appendChild(installButton);
+        }
+    </script>
 </body>
 </html>
