@@ -34,14 +34,42 @@
 
                 <hr>
 
+                {{-- Botão de Editar (Somente visível para o usuário que publicou a ocorrência) --}}
+                @if(Auth::check() && Auth::user()->id === $ocorrencia->user_id)
+                    <div class="d-flex justify-content-end" id="btnEditarOcorrencia">
+                        <a href="{{ route('ocorrencias.edit', $ocorrencia->id) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-edit"></i> Editar Ocorrência
+                        </a>
+                    </div>
+                    <hr>
+                @endif
+
                 {{-- Ícone de Compartilhar --}}
-                <div class="d-flex justify-content-center mb-3">
+                <div class="d-flex justify-content-center mb-3" id="btnCompartilharContainer">
                     <button id="btnCompartilhar" class="btn btn-secondary">
                         <i class="fas fa-share-alt"></i> Compartilhar Ocorrência
                     </button>
                 </div>
 
                 <hr>
+
+                {{-- Seção de Comentários --}}
+                <div class="comentarios-secao">
+                    <h3 class="mb-3">Comentários</h3>
+
+                    {{-- Lista de Comentários --}}
+                    @forelse ($ocorrencia->comentarios as $comentario)
+                        <div class="mb-3 border p-4 rounded bg-light shadow-sm">
+                            <p><strong>{{ $comentario->usuario->name ?? 'Usuário Anônimo' }}</strong> comentou:</p>
+                            <p>{{ $comentario->comentario }}</p>
+                            <small class="text-muted">
+                                {{ $comentario->created_at->diffForHumans() }} ({{ $comentario->created_at->format('d/m/Y H:i') }})
+                            </small>
+                        </div>
+                    @empty
+                        <p>Não há comentários ainda.</p>
+                    @endforelse
+                </div>
             </div>
         </div>
     </div>
@@ -92,6 +120,16 @@
         max-width: 900px;
         height: auto;
     }
+    .exibir_conteudo {
+    padding: 5.7rem 1.5rem;
+}
+
+@media (min-width: 768px) { /* Aplica para telas maiores que 768px (Tablets e Desktop) */
+    .exibir_conteudo {
+        padding: 6rem;
+    }
+}
+
 </style>
 
 {{-- JavaScript para Capturar e Compartilhar a Imagem --}}
@@ -99,6 +137,14 @@
 <script>
     document.getElementById('btnCompartilhar').addEventListener('click', function () {
         let card = document.getElementById('ocorrenciaCard');
+        let comentarios = document.querySelector('.comentarios-secao');
+        let btnCompartilharContainer = document.getElementById('btnCompartilharContainer');
+        let btnEditarOcorrencia = document.getElementById('btnEditarOcorrencia');
+
+        // Ocultar comentários, botão de compartilhar e botão de editar antes da captura
+        if (comentarios) comentarios.style.display = 'none';
+        if (btnCompartilharContainer) btnCompartilharContainer.style.display = 'none';
+        if (btnEditarOcorrencia) btnEditarOcorrencia.style.display = 'none';
 
         // Criar um container temporário para o print
         let printDiv = document.createElement('div');
@@ -130,29 +176,20 @@
 
         html2canvas(printDiv, { scale: 2 }).then(canvas => {
             let imgData = canvas.toDataURL('image/png');
-            
+
             // Remover div temporária
             document.body.removeChild(printDiv);
+
+            // Exibir novamente os elementos ocultos
+            if (comentarios) comentarios.style.display = 'block';
+            if (btnCompartilharContainer) btnCompartilharContainer.style.display = 'flex';
+            if (btnEditarOcorrencia) btnEditarOcorrencia.style.display = 'flex';
 
             // Criar um link para baixar a imagem
             let link = document.createElement('a');
             link.href = imgData;
             link.download = 'ocorrencia_story.png';
             link.click();
-
-            // Se o navegador suportar Web Share API, permitir compartilhamento direto
-            if (navigator.share) {
-                canvas.toBlob(blob => {
-                    let file = new File([blob], "ocorrencia_story.png", { type: "image/png" });
-                    let filesArray = [file];
-
-                    navigator.share({
-                        title: "Confira esta ocorrência!",
-                        text: "Veja essa ocorrência no UaiResolve.",
-                        files: filesArray
-                    }).catch(error => console.log('Erro ao compartilhar:', error));
-                });
-            }
         });
     });
 </script>
