@@ -11,15 +11,17 @@
                     <a href="{{ route('ocorrencias.index') }}" class="text-decoration-none text-dark">
                         <i class="fas fa-arrow-left fa-lg"></i>
                     </a>
-                    <h2 class="ms-2 mb-0 fs-5 fs-md-3">Detalhes da Ocorrência</h2>
+                    <h2 class="ms-2 mb-0 fs-5 fs-md-3">Detalhes da {{ $tituloOcorrencia }}</h2>
                 </div>
 
                 {{-- Detalhes da ocorrência --}}
                 <div class="mb-3">
                     <p><strong>Título:</strong> <span class="text-muted">{{ $ocorrencia->titulo }}</span></p>
                     <p><strong>Descrição:</strong> <span class="text-muted">{{ $ocorrencia->descricao }}</span></p>
-                    <p><strong>Localização:</strong> <span class="text-muted">{{ $ocorrencia->localizacao }}</span></p>
-                    <p><strong>Publicado em:</strong> <span class="text-muted">{{ $ocorrencia->created_at->format('d/m/Y H:i') }}</span></p>
+                    <p class="{{ $ocorrencia->tipo != 'O' ? 'd-none' : '' }}"><strong>Localização:</strong> <span class="text-muted">{{ $ocorrencia->localizacao }}</span></p>
+                    <p><strong>Publicado em:</strong> <span class="text-muted">
+                        {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
+                    </span></p>
                 </div>
 
                 @if($ocorrencia->imagem)
@@ -30,13 +32,23 @@
 
                 <hr>
 
+                {{-- Botão de Editar (Somente visível para o usuário que publicou a ocorrência) --}}
+                @if(Auth::check() && Auth::user()->id === $ocorrencia->user_id)
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ route('ocorrencias.edit', $ocorrencia->id) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-edit"></i> Editar Ocorrência
+                        </a>
+                    </div>
+                    <hr>
+                @endif
+
                 {{-- Seção de Comentários --}}
                 <h3 class="mb-3">Comentários</h3>
 
                 {{-- Formulário de Comentários (Somente para usuários logados) --}}
                 @auth
-                    <form action="{{ route('comentarios.store', $ocorrencia) }}" method="POST">
-                        @csrf
+                <form action="{{ route('comentarios.store', $ocorrencia->id) }}" method="POST">
+                    @csrf
                         <div class="mb-3">
                             <label for="comentario" class="form-label">Deixe seu comentário</label>
                             <textarea name="comentario" class="form-control" rows="3" required></textarea>
@@ -102,6 +114,12 @@
 
     .shadow-sm {
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Estilo para destacar a data dos comentários */
+    .mb-3 small {
+        font-style: italic;
+        color: #6c757d;
     }
 </style>
 

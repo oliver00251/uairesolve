@@ -9,7 +9,7 @@ class Ocorrencia extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['titulo', 'descricao', 'localizacao','user_id','categoria_id', 'status', 'imagem'];
+    protected $fillable = ['titulo', 'descricao','tipo', 'localizacao','user_id','categoria_id', 'status', 'imagem'];
     
     public function comentarios() {
         return $this->hasMany(Comentario::class)->with('usuario');

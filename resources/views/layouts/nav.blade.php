@@ -28,9 +28,21 @@
                         <i class="fas fa-clipboard-list"></i> Ocorrência
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="ocorrenciaDropdown">
-                        <li><a class="dropdown-item" href="{{ route('ocorrencias.create') }}"><i class="fas fa-plus-circle"></i> Nova Ocorrência</a></li>
-                        <li><a class="dropdown-item" href="{{ route('ocorrencias.index') }}"><i class="fas fa-list"></i> Visualizar Ocorrências</a></li>
+                
+                        <li>
+                            <a class="dropdown-item" href="{{ route('ocorrencias.index', ['filtro' => 'O']) }}"><i class="fas fa-exclamation-circle"></i> Ocorrências</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('ocorrencias.index', ['filtro' => 'S']) }}"><i class="fas fa-lightbulb"></i> Sugestões</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-none" href="{{ route('ocorrencias.index', ['filtro' => 'I']) }}"><i class="fas fa-user-check"></i> Indicações</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-none" href="{{ route('ocorrencias.index', ['filtro' => 'D']) }}"><i class="fas fa-bullhorn"></i> Denúncias</a>
+                        </li>
                     </ul>
+                    
                 </div>
 
                 <!-- Perfil do Usuário -->

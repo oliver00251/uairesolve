@@ -16,14 +16,15 @@ return new class extends Migration
         Schema::create('ocorrencias', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            $table->foreignId('categoria_id');
+            $table->string('categoria_id')->nullable();
             $table->string('titulo');
             $table->text('descricao');
             $table->string('imagem')->nullable();
+            $table->string('tipo',1); // O = Ocorrencia;S = sugestão; I=Indicação; D= Denuncias
             $table->string('localizacao')->nullable();
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
-            $table->enum('status', ['Aberta', 'Em andamento', 'Resolvida'])->default('Aberta');
+            $table->enum('status', ['Aberta', 'Em andamento', 'Resolvida','Arquivada'])->default('Aberta');
             $table->timestamps();
         });
     }

@@ -3,46 +3,39 @@
 @section('content')
 @auth
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Registrar Nova Ocorrência</h2>
-
-    <form action="{{ route('ocorrencias.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-
-        <div class="mb-3">
-            <label for="titulo" class="form-label">Título</label>
-            <input type="text" id="titulo" name="titulo" class="form-control" required>
+    @if($registro == 'O')
+        <div class="registro_new">
+            @include('form.ocorrencia')
         </div>
-
-        <div class="mb-3">
-            <label for="descricao" class="form-label">Descrição</label>
-            <textarea id="descricao" name="descricao" class="form-control" rows="3" required></textarea>
+    @endif
+    @if($registro == 'S')
+        <div class="registro_new">
+            @include('form.sugestao')
         </div>
+    @endif
 
-        <div class="mb-3">
-            <label for="localizacao" class="form-label">Localização</label>
-            <input type="text" id="localizacao" name="localizacao" class="form-control" required>
-        </div>
+    <style>
+        /* Estilos gerais para a classe .registro_new */
+        .registro_new {
+            padding: 3rem; /* Definido para desktop */
+        }
 
-        <div class="mb-3">
-            <label for="imagem" class="form-label">Imagem (opcional)</label>
-            <input type="file" id="imagem" name="imagem" class="form-control">
-        </div>
+        /* Estilos para telas menores que 768px (Mobile) */
+        @media (max-width: 768px) {
+            .registro_new {
+                padding: 1rem; /* Ajuste para mobile */
+            }
 
-        <button type="submit" class="btn btn-primary">Registrar Ocorrência</button>
-    </form>
+            .alert {
+                padding-top: 12rem !important;
+            }
+        }
+    </style>
 </div>
 @else
 <div class="alert alert-warning text-center mt-4 min-vh-100">
     Você precisa estar logado para registrar uma ocorrência. <br>
     <a href="{{ route('login') }}" class="btn btn-primary mt-2">Fazer Login</a>
 </div>
-<style>
-    @media (max-width: 767px) {
-    .alert {
-        padding-top: 12rem !important;
-    }
-}
-
-</style>
 @endauth
 @endsection
