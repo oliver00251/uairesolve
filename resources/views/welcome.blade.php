@@ -17,7 +17,7 @@
             <i class="fas fa-map-marker-alt"></i> Visualizar Ocorrências
         </a>
         
-        <a href="{{ route('ocorrencias.index', ['filtro' => 'S']) }}" class="btn btn-light btn-lg px-4 rounded-pill text-primary">
+        <a href="{{ route('ocorrencias.index', ['filtro' => 'S']) }}" class="btn btn-light btn-lg px-4 mt-3 rounded-pill text-primary">
             <i class="fas fa-lightbulb"></i> Visualizar Sugestões
         </a>
         
