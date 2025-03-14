@@ -70,7 +70,7 @@
     .story-mode {
         width: 1080px !important;
         height: 1920px !important;
-        background: #fff;
+        background: linear-gradient(180deg, #0D6EFD, #4A90E2);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -78,25 +78,31 @@
         text-align: center;
         padding: 80px 60px;
         border-radius: 20px;
+        position: relative;
     }
 
     .story-mode h2 {
         font-size: 60px !important;
         font-weight: bold;
+        color: #fff;
         margin-bottom: 20px;
     }
 
     .story-mode p {
         font-size: 40px;
-        color: #555;
+        color: #fff;
         line-height: 1.3;
+        max-width: 80%;
     }
 
     .story-mode img {
         max-width: 85%;
         max-height: 60%;
         object-fit: cover;
-        border-radius: 20px;
+        border-radius: 7px;
+        background: #fff;
+        padding: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
         margin: 20px 0;
     }
 
@@ -104,7 +110,7 @@
         font-size: 35px;
         font-weight: bold;
         margin-top: 30px;
-        color: #222;
+        color: #fff;
     }
 
     .story-logo {
@@ -113,6 +119,11 @@
         left: 50%;
         transform: translateX(-50%);
         width: 250px;
+    }
+
+    /* Oculta os comentários e o botão de compartilhar no print */
+    .hide-on-print {
+        display: none !important;
     }
 </style>
 
@@ -133,9 +144,15 @@
 
         // Salvar estilos originais
         let originalClass = card.className;
+        let button = document.getElementById('btnCompartilhar');
+        let comments = document.querySelectorAll('.card .border');
 
         // Aplicar estilos de Story
         card.classList.add('story-mode');
+
+        // Esconder botão de compartilhar e comentários
+        if (button) button.classList.add('hide-on-print');
+        comments.forEach(comment => comment.classList.add('hide-on-print'));
 
         // Adicionar elementos temporários
         card.prepend(logo);
@@ -151,6 +168,8 @@
 
             // Restaurar estilos e remover elementos extras
             card.className = originalClass;
+            if (button) button.classList.remove('hide-on-print');
+            comments.forEach(comment => comment.classList.remove('hide-on-print'));
             logo.remove();
             footer.remove();
 
