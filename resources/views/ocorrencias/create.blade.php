@@ -33,9 +33,11 @@
     </style>
 </div>
 @else
-<div class="alert alert-warning text-center mt-4 min-vh-100">
-    Você precisa estar logado para registrar uma ocorrência. <br>
+<div class="alert  text-center d-flex flex-column justify-content-center align-items-center min-vh-100">
+    <p class="mb-2">Você precisa estar logado para registrar uma ocorrência.</p>
     <a href="{{ route('login') }}" class="btn btn-primary mt-2">Fazer Login</a>
 </div>
+
+
 @endauth
 @endsection

@@ -73,8 +73,3 @@
         </div>
     </div>
 </nav>
-<style>
-    nav {
-    border-radius: 0rem 0rem 1.5rem 1.5rem;
-}
-</style>

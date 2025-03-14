@@ -26,6 +26,11 @@
       @include('layouts.nav')
         
         @yield('content') <!-- Aqui vai o conteúdo das páginas -->
+        <style>
+    nav{
+    border-radius: 0rem 0rem 1.5rem 1.5rem;
+}
+</style>
     </div>
 
     <!-- jQuery (necessário para o DataTables e Select2) -->
