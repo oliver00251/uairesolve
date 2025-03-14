@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-6 exibir_conteudo">
             {{-- Card de Ocorrência --}}
-            <div class="card shadow-sm p-4 story-format" id="ocorrenciaCard">
+            <div class="card shadow-sm p-4" id="ocorrenciaCard">
                 {{-- Ícone de voltar --}}
                 <div class="d-flex align-items-center mb-4">
                     <a href="{{ route('ocorrencias.index') }}" class="text-decoration-none text-dark">
@@ -57,26 +57,32 @@
     </div>
 </div>
 
-{{-- CSS para padronizar o tamanho da imagem do story --}}
+{{-- CSS para manter o card normal na exibição --}}
 <style>
-    .story-format {
-        width: 1080px; /* Largura padrão para stories do Instagram */
-        height: 1920px; /* Altura padrão para stories */
-        max-width: 100%; /* Para responsividade */
-        background: white; /* Garante um fundo sólido */
+    .ocorrencia-img {
+        max-width: 100%;
+        max-height: 400px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    /* Estilos do modo story (aplicado apenas na geração da imagem) */
+    .story-mode {
+        width: 1080px !important;
+        height: 1920px !important;
+        background: white;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
-        padding: 20px;
+        padding: 50px;
         text-align: center;
     }
 
-    .ocorrencia-img {
-        max-width: 100%;
-        max-height: 60vh; /* Mantém a proporção */
+    .story-mode img {
+        max-width: 90%;
+        max-height: 60%;
         object-fit: cover;
-        border-radius: 8px;
     }
 </style>
 
@@ -86,12 +92,22 @@
     document.getElementById('btnCompartilhar').addEventListener('click', function () {
         let card = document.getElementById('ocorrenciaCard');
 
+        // Salvar estilos originais
+        let originalClass = card.className;
+
+        // Aplicar estilos para o formato de Story
+        card.classList.add('story-mode');
+
+        // Gerar a imagem
         html2canvas(card, {
             width: 1080,
             height: 1920,
             scale: 2
         }).then(canvas => {
             let imgData = canvas.toDataURL('image/png');
+
+            // Restaurar estilos originais após a captura
+            card.className = originalClass;
 
             // Criar um link para baixar a imagem
             let link = document.createElement('a');
