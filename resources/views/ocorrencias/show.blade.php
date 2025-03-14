@@ -57,7 +57,7 @@
     </div>
 </div>
 
-{{-- CSS para manter o card normal na exibição --}}
+{{-- CSS para visualização normal --}}
 <style>
     .ocorrencia-img {
         max-width: 100%;
@@ -66,23 +66,53 @@
         border-radius: 8px;
     }
 
-    /* Estilos do modo story (aplicado apenas na geração da imagem) */
+    /* Estilos aplicados SOMENTE no print */
     .story-mode {
         width: 1080px !important;
         height: 1920px !important;
-        background: white;
+        background: #fff;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding: 50px;
         text-align: center;
+        padding: 80px 60px;
+        border-radius: 20px;
+    }
+
+    .story-mode h2 {
+        font-size: 60px !important;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .story-mode p {
+        font-size: 40px;
+        color: #555;
+        line-height: 1.3;
     }
 
     .story-mode img {
-        max-width: 90%;
+        max-width: 85%;
         max-height: 60%;
         object-fit: cover;
+        border-radius: 20px;
+        margin: 20px 0;
+    }
+
+    .story-footer {
+        font-size: 35px;
+        font-weight: bold;
+        margin-top: 30px;
+        color: #222;
+    }
+
+    .story-logo {
+        position: absolute;
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 250px;
     }
 </style>
 
@@ -92,11 +122,24 @@
     document.getElementById('btnCompartilhar').addEventListener('click', function () {
         let card = document.getElementById('ocorrenciaCard');
 
+        // Criar elementos extras para o Story
+        let logo = document.createElement('img');
+        logo.src = "{{ asset('storage/logo.png') }}"; // Caminho do logo
+        logo.className = 'story-logo';
+
+        let footer = document.createElement('p');
+        footer.className = 'story-footer';
+        footer.innerText = "UaiResolve - Juntos pela Cidade!";
+
         // Salvar estilos originais
         let originalClass = card.className;
 
-        // Aplicar estilos para o formato de Story
+        // Aplicar estilos de Story
         card.classList.add('story-mode');
+
+        // Adicionar elementos temporários
+        card.prepend(logo);
+        card.appendChild(footer);
 
         // Gerar a imagem
         html2canvas(card, {
@@ -106,8 +149,10 @@
         }).then(canvas => {
             let imgData = canvas.toDataURL('image/png');
 
-            // Restaurar estilos originais após a captura
+            // Restaurar estilos e remover elementos extras
             card.className = originalClass;
+            logo.remove();
+            footer.remove();
 
             // Criar um link para baixar a imagem
             let link = document.createElement('a');
