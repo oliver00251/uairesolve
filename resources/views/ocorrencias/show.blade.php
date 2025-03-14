@@ -42,18 +42,6 @@
                 </div>
 
                 <hr>
-
-                {{-- Lista de Comentários --}}
-                <h3 class="mb-3">Comentários</h3>
-                @forelse ($ocorrencia->comentarios as $comentario)
-                    <div class="mb-3 border p-4 rounded bg-light shadow-sm">
-                        <p><strong>{{ $comentario->usuario->name ?? 'Usuário Anônimo' }}</strong> comentou:</p>
-                        <p>{{ $comentario->comentario }}</p>
-                        <small class="text-muted">{{ $comentario->created_at->diffForHumans() }} ({{ $comentario->created_at->format('d/m/Y H:i') }})</small>
-                    </div>
-                @empty
-                    <p>Não há comentários ainda.</p>
-                @endforelse
             </div>
         </div>
     </div>
@@ -62,11 +50,12 @@
 {{-- CSS para formatação no print --}}
 <style>
     .ocorrencia-img {
-        max-width: 100%;
-        max-height: 400px;
+        width: 85%;
+        max-width: 900px;
         object-fit: cover;
-        border-radius: 7px;
-        border: 5px solid white;
+        border-radius: 15px;
+        border: 8px solid white;
+        margin-top: 20px;
     }
 
     /* Estilos aplicados SOMENTE no print */
@@ -78,23 +67,24 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding: 40px;
+        padding: 60px;
         text-align: center;
         color: white;
-        font-size: 24px;
-        font-weight: bold;
+        font-family: 'Arial', sans-serif;
         border-radius: 20px;
     }
 
     .print-mode h2 {
-        font-size: 42px;
-        font-weight: 700;
+        font-size: 64px;
+        font-weight: 800;
+        text-transform: uppercase;
     }
 
     .print-mode p {
-        font-size: 28px;
-        max-width: 80%;
-        margin-bottom: 20px;
+        font-size: 42px;
+        max-width: 85%;
+        margin-bottom: 30px;
+        font-weight: 500;
     }
 
     .print-mode .ocorrencia-img {
