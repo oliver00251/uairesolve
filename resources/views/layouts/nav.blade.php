@@ -17,7 +17,7 @@
 
             @auth
                 <!-- Ícone de Notificações -->
-                <a class="nav-link position-relative me-3" href="#">
+                <a class="nav-link position-relative me-3 d-none" href="#">
                     <i class="fas fa-bell fs-5"></i>
                     <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">3</span>
                 </a>
