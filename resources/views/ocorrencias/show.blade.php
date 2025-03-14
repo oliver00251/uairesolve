@@ -26,7 +26,7 @@
 
                 @if($ocorrencia->imagem)
                     <div class="text-center my-4">
-                        <img src="{{ asset('storage/' . $ocorrencia->imagem) }}" class="img-fluid rounded shadow">
+                        <img src="{{ asset('storage/' . $ocorrencia->imagem) }}" class="img-fluid ocorrencia-img shadow">
                     </div>
                 @endif
 
@@ -56,6 +56,16 @@
         </div>
     </div>
 </div>
+
+{{-- CSS para padronizar o tamanho da imagem --}}
+<style>
+    .ocorrencia-img {
+        max-width: 100%; /* Mantém a imagem responsiva */
+        max-height: 400px; /* Limita a altura */
+        object-fit: cover; /* Evita distorções e preenche o espaço */
+        border-radius: 8px; /* Bordas arredondadas para melhor estética */
+    }
+</style>
 
 {{-- JavaScript para Capturar e Compartilhar a Imagem --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
