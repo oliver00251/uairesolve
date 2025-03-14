@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-6 exibir_conteudo">
             {{-- Card de Ocorrência --}}
-            <div class="card shadow-sm p-4" id="ocorrenciaCard">
+            <div class="card shadow-sm p-4 story-format" id="ocorrenciaCard">
                 {{-- Ícone de voltar --}}
                 <div class="d-flex align-items-center mb-4">
                     <a href="{{ route('ocorrencias.index') }}" class="text-decoration-none text-dark">
@@ -57,13 +57,26 @@
     </div>
 </div>
 
-{{-- CSS para padronizar o tamanho da imagem --}}
+{{-- CSS para padronizar o tamanho da imagem do story --}}
 <style>
+    .story-format {
+        width: 1080px; /* Largura padrão para stories do Instagram */
+        height: 1920px; /* Altura padrão para stories */
+        max-width: 100%; /* Para responsividade */
+        background: white; /* Garante um fundo sólido */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        text-align: center;
+    }
+
     .ocorrencia-img {
-        max-width: 100%; /* Mantém a imagem responsiva */
-        max-height: 400px; /* Limita a altura */
-        object-fit: cover; /* Evita distorções e preenche o espaço */
-        border-radius: 8px; /* Bordas arredondadas para melhor estética */
+        max-width: 100%;
+        max-height: 60vh; /* Mantém a proporção */
+        object-fit: cover;
+        border-radius: 8px;
     }
 </style>
 
@@ -73,19 +86,23 @@
     document.getElementById('btnCompartilhar').addEventListener('click', function () {
         let card = document.getElementById('ocorrenciaCard');
 
-        html2canvas(card, { scale: 2 }).then(canvas => {
+        html2canvas(card, {
+            width: 1080,
+            height: 1920,
+            scale: 2
+        }).then(canvas => {
             let imgData = canvas.toDataURL('image/png');
-            
+
             // Criar um link para baixar a imagem
             let link = document.createElement('a');
             link.href = imgData;
-            link.download = 'ocorrencia.png';
+            link.download = 'ocorrencia_story.png';
             link.click();
 
             // Se o navegador suportar Web Share API, permitir compartilhamento direto
             if (navigator.share) {
                 canvas.toBlob(blob => {
-                    let file = new File([blob], "ocorrencia.png", { type: "image/png" });
+                    let file = new File([blob], "ocorrencia_story.png", { type: "image/png" });
                     let filesArray = [file];
 
                     navigator.share({
