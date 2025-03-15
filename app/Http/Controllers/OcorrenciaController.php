@@ -3,22 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ocorrencia;
-use App\Models\OcorrenciaLog; // Importando o modelo de log
+use App\Models\OcorrenciaLog;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class OcorrenciaController extends Controller
 {
+    private $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     public function index($filtro = null)
     {
-        // Verifica se o filtro recebido é válido
         $tiposValidos = ['O', 'S', 'I', 'D']; // Ocorrência, Sugestão, Indicação, Denúncia
 
         if ($filtro && !in_array($filtro, $tiposValidos)) {
-            abort(404); // Retorna erro 404 se o tipo for inválido
+            abort(404);
         }
 
-        // Busca apenas ocorrências abertas, filtrando por tipo se necessário
         $ocorrencias = Ocorrencia::where('status', 'Aberta')
             ->when($filtro, function ($query) use ($filtro) {
                 return $query->where('tipo', $filtro);
@@ -35,29 +41,30 @@ class OcorrenciaController extends Controller
         return view('ocorrencias.create', compact('registro')); // Passa o tipo para a view
     }
 
-    private $imageService; // <-- ADICIONE ESTA LINHA
-
-    public function __construct(ImageService $imageService)
-    {
-        $this->imageService = $imageService;
-    }
-
     public function store(Request $request)
     {
-       
-        $request->validate([
+        // Validação de dados
+        $validator = Validator::make($request->all(), [
             'titulo' => 'required|string|max:255',
             'descricao' => 'required|string',
             'localizacao' => 'nullable|string',
             'tipo' => 'nullable|string',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
+            'imagem' => 'nullable|image|max:20480', // Limite de 20MB
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
 
         $data = $request->only(['titulo', 'descricao', 'localizacao', 'tipo', 'categoria_id']);
         $data['user_id'] = auth()->id();
 
-        // Processar a imagem antes de salvar
+        // Processa a imagem, se houver
         if ($request->hasFile('imagem')) {
             $data['imagem'] = $this->imageService->processAndSave($request->file('imagem'));
         }
@@ -75,16 +82,16 @@ class OcorrenciaController extends Controller
             ]);
         }
 
-        return redirect()->route('ocorrencias.index')->with('success', 'Ocorrência registrada com sucesso!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Ocorrência registrada com sucesso!',
+            'redirect' => route('ocorrencias.index')
+        ]);
     }
-
 
     public function show(Ocorrencia $ocorrencia)
     {
-        // Carregar os comentários relacionados à ocorrência
         $ocorrencia->load('comentarios');
-
-        // Definir o título da ocorrência conforme o tipo
         $tituloOcorrencia = [
             'O' => 'Ocorrência',
             'I' => 'Infraestrutura',
@@ -98,65 +105,79 @@ class OcorrenciaController extends Controller
     }
 
     public function edit(Ocorrencia $ocorrencia)
-{
-    // Verifica se o usuário autenticado é o autor da ocorrência ou um administrador
-    if ($ocorrencia->user_id !== auth()->id() && !auth()->user()->is_admin) {
-        return redirect()->route('ocorrencias.index')->with('error', 'Você não tem permissão para editar esta ocorrência.');
+    {
+        if ($ocorrencia->user_id !== auth()->id() && !auth()->user()->is_admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Você não tem permissão para editar esta ocorrência.'
+            ]);
+        }
+
+        return view('ocorrencias.edit', compact('ocorrencia'));
     }
 
-    return view('ocorrencias.edit', compact('ocorrencia'));
-}
+    public function update(Request $request, Ocorrencia $ocorrencia)
+    {
+        // Verificação de permissão
+        if ($ocorrencia->user_id !== auth()->id() && !auth()->user()->is_admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Você não tem permissão para editar esta ocorrência.'
+            ]);
+        }
 
-public function update(Request $request, Ocorrencia $ocorrencia)
-{
-    // Verifica se o usuário autenticado é o autor da ocorrência ou um administrador
-    if ($ocorrencia->user_id !== auth()->id() && !auth()->user()->is_admin) {
-        return redirect()->route('ocorrencias.index')->with('error', 'Você não tem permissão para editar esta ocorrência.');
-    }
+        // Validação de dados
+        $validator = Validator::make($request->all(), [
+            'titulo' => 'required|string|max:255',
+            'descricao' => 'required|string',
+            'localizacao' => 'nullable|string',
+            'status' => 'required|in:Aberta,Em andamento,Resolvida,Excluir',
+            'imagem' => 'nullable|image|max:20480', // Limite de 20MB
+        ]);
 
-    $request->validate([
-        'titulo' => 'required|string|max:255',
-        'descricao' => 'required|string',
-        'localizacao' => 'nullable|string',
-        'status' => 'required|in:Aberta,Em andamento,Resolvida,Excluir',
-        'imagem' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-    ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
 
-    $data = [];
-    $data['titulo'] = $request->input('titulo');
-    $data['descricao'] = $request->input('descricao');
-    $data['localizacao'] = $request->input('localizacao');
-    $data['status'] = $request->input('status') == 'Excluir' ? 'Arquivada' : $request->input('status');
+        $data = [];
+        $data['titulo'] = $request->input('titulo');
+        $data['descricao'] = $request->input('descricao');
+        $data['localizacao'] = $request->input('localizacao');
+        $data['status'] = $request->input('status') == 'Excluir' ? 'Arquivada' : $request->input('status');
 
-    // Verifica se a latitude e longitude foram passadas e registra no log
-    if ($request->has('latitude') && $request->has('longitude')) {
-        OcorrenciaLog::create([
-            'user_id' => auth()->id(),
-            'ocorrencia_id' => $ocorrencia->id,
-            'latitude' => $request->input('latitude'),
-            'longitude' => $request->input('longitude')
+        // Processa a imagem, se houver
+        if ($request->hasFile('imagem')) {
+            $data['imagem'] = $this->imageService->processAndSave($request->file('imagem'));
+        }
+
+        // Atualiza a ocorrência
+        $ocorrencia->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ocorrência atualizada com sucesso!',
+            'redirect' => route('ocorrencias.index')
         ]);
     }
 
-    if ($request->hasFile('imagem')) {
-        $data['imagem'] = $request->file('imagem')->store('ocorrencias', 'public');
-    }
-
-    $ocorrencia->update($data);
-
-    return redirect()->route('ocorrencias.index')->with('success', 'Ocorrência atualizada com sucesso!');
-}
-
-
     public function destroy(Ocorrencia $ocorrencia)
     {
-        // Verifica se o usuário autenticado é o autor da ocorrência
         if ($ocorrencia->user_id !== auth()->id()) {
-            return redirect()->route('ocorrencias.index')->with('error', 'Você não tem permissão para excluir esta ocorrência.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Você não tem permissão para excluir esta ocorrência.'
+            ]);
         }
 
         $ocorrencia->delete();
 
-        return redirect()->route('ocorrencias.index')->with('success', 'Ocorrência removida com sucesso!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Ocorrência removida com sucesso!',
+            'redirect' => route('ocorrencias.index')
+        ]);
     }
 }

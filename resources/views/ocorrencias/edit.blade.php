@@ -16,7 +16,7 @@
 
                 {{-- Verificando se o usuário é o autor da ocorrência ou um administrador --}}
                 @if(Auth::check() && (Auth::user()->id === $ocorrencia->user_id || Auth::user()->is_admin))
-                    <form action="{{ route('ocorrencias.update', $ocorrencia->id) }}" method="POST" enctype="multipart/form-data">
+                    <form id="editOcorrenciaForm" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <label for="status" class="form-label">Ações</label>
@@ -55,7 +55,7 @@
                         </div>
 
                         {{-- Botão de Submissão --}}
-                        <button type="submit" class="btn btn-success w-100">Salvar Alterações</button>
+                        <button type="submit" id="submitBtn" class="btn btn-success w-100">Salvar Alterações</button>
                     </form>
                 @else
                     <p class="text-danger">Você não tem permissão para editar este conteúdo.</p>
@@ -106,4 +106,62 @@
     }
 </style>
 
+@endsection
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.getElementById('editOcorrenciaForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Previne o envio normal do formulário
+
+    // Desabilita o botão de envio
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Enviando...';
+
+    const formData = new FormData(this); // Pega os dados do formulário
+
+    // Envia o formulário via fetch (AJAX)
+    fetch("{{ route('ocorrencias.update', $ocorrencia->id) }}", {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Exibe o sucesso usando SweetAlert2
+            Swal.fire({
+                icon: 'success',
+                title: data.message,
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => {
+                window.location.href = data.redirect; // Redireciona após o sucesso
+            });
+        } else {
+            // Exibe o erro usando SweetAlert2
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: data.errors ? Object.values(data.errors).join(', ') : data.message
+            }).then(() => {
+                submitBtn.disabled = false; // Reabilita o botão
+                submitBtn.innerHTML = 'Salvar Alterações';
+            });
+        }
+    })
+    .catch(error => {
+        // Caso ocorra um erro
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            text: 'Algo deu errado, tente novamente mais tarde.'
+        }).then(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Salvar Alterações';
+        });
+    });
+});
+</script>
 @endsection

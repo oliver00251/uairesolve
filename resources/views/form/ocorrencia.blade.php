@@ -1,8 +1,9 @@
 <h2 class="text-center mb-4">Registrar Nova Ocorrência</h2>
 
-<form action="{{ route('ocorrencias.store') }}" method="POST" enctype="multipart/form-data">
+<form id="form-ocorrencia" enctype="multipart/form-data">
     @csrf
     <input type="text" value="{{$registro}}" name="tipo" hidden>
+    
     <div class="mb-3">
         <label for="titulo" class="form-label">Título</label>
         <input type="text" id="titulo" name="titulo" class="form-control" required>
@@ -22,28 +23,103 @@
         <label for="imagem" class="form-label">Imagem (opcional)</label>
         <input type="file" id="imagem" name="imagem" class="form-control">
     </div>
+
     @include('form.localizacao')
 
+    <div id="status-message" style="display: none; margin-top: 10px;" class="alert alert-info">
+        Enviando, por favor aguarde...
+    </div>
 
-    <button type="submit" class="btn btn-primary">Registrar Ocorrência</button>
+    <button type="submit" id="submit-button" class="btn btn-primary">Registrar Ocorrência</button>
 </form>
+
 <style>
-    @media (max-width: 767px) {
-    .alert {
-        padding-top: 12rem !important;
+    #status-message {
+        display: none;
+        margin-top: 10px;
     }
 
     .registro_new {
-    padding: 3rem !important; /* Desktop */
-}
-
-/* Estilos para telas menores que 768px (Mobile) */
-@media (max-width: 768px) {
-    .registro_new  {
-        padding: 3rem; /* Ajuste menor para mobile */
+        padding: 3rem !important;
     }
-}
-
-}
-
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.9/dist/sweetalert2.all.min.js"></script>
+<script>
+    document.getElementById('form-ocorrencia').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const submitButton = document.getElementById('submit-button');
+        const statusMessage = document.getElementById('status-message');
+        const formData = new FormData(this);
+
+        // Validação de tamanho da imagem no front-end (limite de 20MB)
+        const fileInput = document.getElementById('imagem');
+        if (fileInput.files.length > 0) {
+            const fileSize = fileInput.files[0].size / 1024 / 1024; // em MB
+            if (fileSize > 20) {
+                Swal.fire({
+                    title: 'Erro!',
+                    text: 'O tamanho da imagem não pode exceder 20MB.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+                return;
+            }
+        }
+
+        // Desabilitar o botão de envio e exibir a mensagem de status
+        submitButton.disabled = true;
+        statusMessage.style.display = 'block';
+
+        // Exibir um alerta de "Enviando" enquanto o envio está em progresso
+        Swal.fire({
+            title: 'Enviando...',
+            text: 'Por favor, aguarde enquanto registramos sua ocorrência.',
+            icon: 'info',
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Envio do formulário via fetch
+        fetch("{{ route('ocorrencias.store') }}", {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    title: 'Sucesso!',
+                    text: 'Ocorrência registrada com sucesso!',
+                    icon: 'success',
+                    confirmButtonText: 'Ok'
+                }).then(() => {
+                    window.location.href = "{{ route('ocorrencias.index') }}"; // Redireciona para a lista de ocorrências
+                });
+            } else {
+                Swal.fire({
+                    title: 'Erro!',
+                    text: 'Erro ao registrar ocorrência. Tente novamente.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Erro!',
+                text: 'Ocorreu um erro. Por favor, tente novamente.',
+                icon: 'error',
+                confirmButtonText: 'Ok'
+            });
+        })
+        .finally(() => {
+            // Reabilita o botão de envio e oculta a mensagem de status
+            submitButton.disabled = false;
+            statusMessage.style.display = 'none';
+        });
+    });
+</script>
