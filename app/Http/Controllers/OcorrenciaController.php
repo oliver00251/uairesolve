@@ -92,57 +92,61 @@ class OcorrenciaController extends Controller
             'D' => 'Denúncia',
             'outro' => 'Outro Tipo',
         ][$ocorrencia->tipo] ?? 'Outro Tipo';
+        $totalLikes = $ocorrencia->likes()->count();
 
-        return view('ocorrencias.show', compact('ocorrencia', 'tituloOcorrencia'));
+        return view('ocorrencias.show', compact('ocorrencia', 'tituloOcorrencia','totalLikes'));
     }
 
     public function edit(Ocorrencia $ocorrencia)
-    {
-        // Verifica se o usuário autenticado é o autor da ocorrência
-        if ($ocorrencia->user_id !== auth()->id()) {
-            return redirect()->route('ocorrencias.index')->with('error', 'Você não tem permissão para editar esta ocorrência.');
-        }
-
-        return view('ocorrencias.edit', compact('ocorrencia'));
+{
+    // Verifica se o usuário autenticado é o autor da ocorrência ou um administrador
+    if ($ocorrencia->user_id !== auth()->id() && !auth()->user()->is_admin) {
+        return redirect()->route('ocorrencias.index')->with('error', 'Você não tem permissão para editar esta ocorrência.');
     }
 
-    public function update(Request $request, Ocorrencia $ocorrencia)
-    {
-        // Verifica se o usuário autenticado é o autor da ocorrência
-        if ($ocorrencia->user_id !== auth()->id()) {
-            return redirect()->route('ocorrencias.index')->with('error', 'Você não tem permissão para editar esta ocorrência.');
-        }
+    return view('ocorrencias.edit', compact('ocorrencia'));
+}
 
-        $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descricao' => 'required|string',
-            'localizacao' => 'nullable|string',
-            'status' => 'required|in:Aberta,Em andamento,Resolvida,Excluir',
-            'imagem' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+public function update(Request $request, Ocorrencia $ocorrencia)
+{
+    // Verifica se o usuário autenticado é o autor da ocorrência ou um administrador
+    if ($ocorrencia->user_id !== auth()->id() && !auth()->user()->is_admin) {
+        return redirect()->route('ocorrencias.index')->with('error', 'Você não tem permissão para editar esta ocorrência.');
+    }
+
+    $request->validate([
+        'titulo' => 'required|string|max:255',
+        'descricao' => 'required|string',
+        'localizacao' => 'nullable|string',
+        'status' => 'required|in:Aberta,Em andamento,Resolvida,Excluir',
+        'imagem' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+    ]);
+
+    $data = [];
+    $data['titulo'] = $request->input('titulo');
+    $data['descricao'] = $request->input('descricao');
+    $data['localizacao'] = $request->input('localizacao');
+    $data['status'] = $request->input('status') == 'Excluir' ? 'Arquivada' : $request->input('status');
+
+    // Verifica se a latitude e longitude foram passadas e registra no log
+    if ($request->has('latitude') && $request->has('longitude')) {
+        OcorrenciaLog::create([
+            'user_id' => auth()->id(),
+            'ocorrencia_id' => $ocorrencia->id,
+            'latitude' => $request->input('latitude'),
+            'longitude' => $request->input('longitude')
         ]);
-
-        $data = [];
-        $data['titulo'] = $request->input('titulo');
-        $data['descricao'] = $request->input('descricao');
-        $data['localizacao'] = $request->input('localizacao');
-        $data['status'] = $request->input('status') == 'Excluir' ? 'Arquivada' : $request->input('status');
-        // Verifica se a latitude e longitude foram passadas e registra no log
-        if ($request->has('latitude') && $request->has('longitude')) {
-            OcorrenciaLog::create([
-                'user_id' => auth()->id(),
-                'ocorrencia_id' => $ocorrencia->id,
-                'latitude' => $request->input('latitude'),
-                'longitude' => $request->input('longitude')
-            ]);
-        }
-        if ($request->hasFile('imagem')) {
-            $data['imagem'] = $request->file('imagem')->store('ocorrencias', 'public');
-        }
-
-        $ocorrencia->update($data);
-
-        return redirect()->route('ocorrencias.index')->with('success', 'Ocorrência atualizada com sucesso!');
     }
+
+    if ($request->hasFile('imagem')) {
+        $data['imagem'] = $request->file('imagem')->store('ocorrencias', 'public');
+    }
+
+    $ocorrencia->update($data);
+
+    return redirect()->route('ocorrencias.index')->with('success', 'Ocorrência atualizada com sucesso!');
+}
+
 
     public function destroy(Ocorrencia $ocorrencia)
     {

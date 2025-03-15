@@ -82,17 +82,53 @@ class AuthController extends Controller
 
     //dashboard
     public function dashboard()
-{
-    $user = Auth::user();
-
-    // Ocorrências criadas pelo usuário
-    $minhasOcorrencias = Ocorrencia::where('user_id', $user->id)->latest()->get();
-
-    // Ocorrências onde o usuário comentou
-    $ocorrenciasComentadas = Ocorrencia::whereHas('comentarios', function ($query) use ($user) {
-        $query->where('user_id', $user->id);
-    })->latest()->get();
-
-    return view('auth.dashboard', compact('user', 'minhasOcorrencias', 'ocorrenciasComentadas'));
-}
+    {
+        $user = Auth::user();
+        
+        // Verifica se o usuário é admin
+        $isAdmin = $user->tipo === 'admin';
+    
+        // Ocorrências para o usuário
+        $minhasOcorrencias = Ocorrencia::where('user_id', $user->id)
+                                        ->latest()
+                                        ->whereIn('status', ['Aberta', 'Em andamento', 'Resolvida'])
+                                        ->get();
+    
+        // Ocorrências onde o usuário comentou
+        $ocorrenciasComentadas = Ocorrencia::whereHas('comentarios', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->latest()->get();
+    
+        // Para o administrador
+        $ocorrencias = $isAdmin ? Ocorrencia::latest()->get() : collect(); // Lista todas as ocorrências para o admin
+        
+        // Métricas para o administrador
+        $totalOcorrencias = null;
+        $ocorrenciasAbertas = null;
+        $ocorrenciasResolvidas = null;
+        $ocorrenciasEmAndamento = null;
+    
+        if ($isAdmin) {
+            $totalOcorrencias = Ocorrencia::count(); // Total de ocorrências
+            $ocorrenciasAbertas = Ocorrencia::where('status', 'Aberta')->count(); // Ocorrências abertas
+            $ocorrenciasResolvidas = Ocorrencia::where('status', 'Resolvida')->count(); // Ocorrências resolvidas
+            $ocorrenciasEmAndamento = Ocorrencia::where('status', 'Em andamento')->count(); // Ocorrências em andamento
+        }
+    
+        // Passa as variáveis para a view
+        return view('auth.dashboard', compact(
+            'user', 
+            'minhasOcorrencias', 
+            'ocorrenciasComentadas',
+            'ocorrencias',
+            'totalOcorrencias', 
+            'ocorrenciasAbertas', 
+            'ocorrenciasResolvidas',
+            'ocorrenciasEmAndamento',
+            'isAdmin' // Passa se é admin ou não
+        ));
+    }
+    
+    
+    
 }

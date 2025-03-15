@@ -14,12 +14,12 @@
                     <h2 class="ms-2 mb-0 fs-5 fs-md-3">Editar {{$ocorrencia->titulo}}</h2>
                 </div>
 
-                {{-- Verificando se o usuário é o autor da ocorrência --}}
-                @if(Auth::check() && Auth::user()->id === $ocorrencia->user_id)
+                {{-- Verificando se o usuário é o autor da ocorrência ou um administrador --}}
+                @if(Auth::check() && (Auth::user()->id === $ocorrencia->user_id || Auth::user()->is_admin))
                     <form action="{{ route('ocorrencias.update', $ocorrencia->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
-                        <label for="titulo" class="form-label">Ações</label>
+                        <label for="status" class="form-label">Ações</label>
 
                         <select name="status" id="status" class="form-select" required>
                             <option value="Aberta" {{ old('status', $ocorrencia->status) == 'Aberta' ? 'selected' : '' }}>Aberta</option>
@@ -46,21 +46,19 @@
                                 <label for="localizacao" class="form-label">Localização</label>
                                 <input type="text" name="localizacao" id="localizacao" class="form-control" value="{{ old('localizacao', $ocorrencia->localizacao) }}">
                             </div>
+                        @endif
 
-                              {{-- Imagem (se houver) --}}
+                        {{-- Imagem (se houver) --}}
                         <div class="mb-3">
                             <label for="imagem" class="form-label">Imagem (opcional)</label>
                             <input type="file" name="imagem" id="imagem" class="form-control">
                         </div>
 
-                        @endif
-                        @include('form.localizacao')
-                      
                         {{-- Botão de Submissão --}}
                         <button type="submit" class="btn btn-success w-100">Salvar Alterações</button>
                     </form>
                 @else
-                    <p class="text-danger">Você não tem permissão para editar este conteudo.</p>
+                    <p class="text-danger">Você não tem permissão para editar este conteúdo.</p>
                 @endif
             </div>
         </div>

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\OcorrenciaController;
+use App\Http\Controllers\OcorrenciaLikeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +28,8 @@ Route::get('/ocorrencias/show/{ocorrencia}', [OcorrenciaController::class, 'show
 Route::get('/ocorrencias/create/{tipo?}', [OcorrenciaController::class, 'create'])->name('ocorrencias.create');  // Criação de nova ocorrência
 
 Route::post('ocorrencias/{ocorrencia}/comentarios', [ComentarioController::class, 'store'])->name('comentarios.store');  // Rota para criação de comentários
+Route::post('ocorrencias/{ocorrencia}/like', [OcorrenciaLikeController::class, 'store'])->name('ocorrencias.like');
+Route::delete('ocorrencias/{ocorrencia}/like', [OcorrenciaLikeController::class, 'destroy'])->name('ocorrencias.unlike');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');

@@ -18,8 +18,7 @@ return new class extends Migration
             $table->string('tipo')->default('user')->after('email');
         });
     
-        // Garantir que só o tipo 'user' será aceito via aplicação
-        DB::statement("ALTER TABLE users ADD CONSTRAINT tipo_check CHECK (tipo = 'user')");
+     
     }
     
     public function down()
