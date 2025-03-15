@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ocorrencia;
-use App\Models\OcorrenciaLog; // Importando o modelo de log
+use App\Models\OcorrenciaLog;
 use Illuminate\Http\Request;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
 
 class OcorrenciaController extends Controller
 {
     public function index($filtro = null) {
-        // Verifica se o filtro recebido é válido
-        $tiposValidos = ['O', 'S', 'I', 'D']; // Ocorrência, Sugestão, Indicação, Denúncia
+        $tiposValidos = ['O', 'S', 'I', 'D'];
         
         if ($filtro && !in_array($filtro, $tiposValidos)) {
-            abort(404); // Retorna erro 404 se o tipo for inválido
+            abort(404);
         }
     
-        // Busca apenas ocorrências abertas, filtrando por tipo se necessário
         $ocorrencias = Ocorrencia::where('status', 'Aberta')
             ->when($filtro, function ($query) use ($filtro) {
                 return $query->where('tipo', $filtro);
@@ -28,8 +28,7 @@ class OcorrenciaController extends Controller
     }
     
     public function create($tipo) {
-        $registro = $tipo; // Recebe o tipo da URL
-        return view('ocorrencias.create', compact('registro')); // Passa o tipo para a view
+        return view('ocorrencias.create', compact('tipo'));
     }
 
     public function store(Request $request) {
@@ -38,22 +37,30 @@ class OcorrenciaController extends Controller
             'descricao' => 'required|string',
             'localizacao' => 'nullable|string',
             'tipo' => 'nullable|string',
-            'imagem' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'latitude' => 'nullable|numeric', // Adicionando a validação para latitude
-            'longitude' => 'nullable|numeric', // Adicionando a validação para longitude
+            'imagem' => 'nullable|image|mimes:jpeg,png,jpg|max:1024', // Reduzido para 1MB
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
         
         $data = $request->only(['titulo', 'descricao', 'localizacao', 'tipo', 'categoria_id']);
-        $data['user_id'] = auth()->id(); // Adiciona o ID do usuário autenticado
+        $data['user_id'] = auth()->id();
         
         if ($request->hasFile('imagem')) {
-            $data['imagem'] = $request->file('imagem')->store('ocorrencias', 'public');
+            $image = $request->file('imagem');
+            $filename = time() . '.webp';
+    
+            $imageResized = Image::make($image)
+                ->resize(1024, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                })
+                ->encode('webp', 80);
+    
+            Storage::disk('public')->put("ocorrencias/{$filename}", $imageResized);
+            $data['imagem'] = "ocorrencias/{$filename}";
         }
     
-        // Cria a ocorrência
         $ocorrencia = Ocorrencia::create($data);
         
-        // Verifica se a latitude e longitude foram passadas e registra no log
         if ($request->has('latitude') && $request->has('longitude')) {
             OcorrenciaLog::create([
                 'user_id' => auth()->id(),
@@ -66,33 +73,7 @@ class OcorrenciaController extends Controller
         return redirect()->route('ocorrencias.index')->with('success', 'Ocorrência registrada com sucesso!');
     }
 
-    public function show(Ocorrencia $ocorrencia) {
-        // Carregar os comentários relacionados à ocorrência
-        $ocorrencia->load('comentarios');
-    
-        // Definir o título da ocorrência conforme o tipo
-        $tituloOcorrencia = [
-            'O' => 'Ocorrência',
-            'I' => 'Infraestrutura',
-            'S' => 'Sugestão',
-            'D' => 'Denúncia',
-            'outro' => 'Outro Tipo',
-        ][$ocorrencia->tipo] ?? 'Outro Tipo';
-    
-        return view('ocorrencias.show', compact('ocorrencia', 'tituloOcorrencia'));
-    }
-
-    public function edit(Ocorrencia $ocorrencia) {
-        // Verifica se o usuário autenticado é o autor da ocorrência
-        if ($ocorrencia->user_id !== auth()->id()) {
-            return redirect()->route('ocorrencias.index')->with('error', 'Você não tem permissão para editar esta ocorrência.');
-        }
-
-        return view('ocorrencias.edit', compact('ocorrencia'));
-    }
-
     public function update(Request $request, Ocorrencia $ocorrencia) {
-        // Verifica se o usuário autenticado é o autor da ocorrência
         if ($ocorrencia->user_id !== auth()->id()) {
             return redirect()->route('ocorrencias.index')->with('error', 'Você não tem permissão para editar esta ocorrência.');
         }
@@ -102,40 +83,37 @@ class OcorrenciaController extends Controller
             'descricao' => 'required|string',
             'localizacao' => 'nullable|string',
             'status' => 'required|in:Aberta,Em andamento,Resolvida,Excluir',
-            'imagem' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'imagem' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
         ]);
     
-        $data = [];
-        $data['titulo'] = $request->input('titulo');
-        $data['descricao'] = $request->input('descricao');
-        $data['localizacao'] = $request->input('localizacao');
+        $data = $request->only(['titulo', 'descricao', 'localizacao', 'status']);
         $data['status'] = $request->input('status') == 'Excluir' ? 'Arquivada' : $request->input('status');
-    // Verifica se a latitude e longitude foram passadas e registra no log
-    if ($request->has('latitude') && $request->has('longitude')) {
-        OcorrenciaLog::create([
-            'user_id' => auth()->id(),
-            'ocorrencia_id' => $ocorrencia->id,
-            'latitude' => $request->input('latitude'),
-            'longitude' => $request->input('longitude')
-        ]);
-    }
+    
+        if ($request->has('latitude') && $request->has('longitude')) {
+            OcorrenciaLog::create([
+                'user_id' => auth()->id(),
+                'ocorrencia_id' => $ocorrencia->id,
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude')
+            ]);
+        }
+    
         if ($request->hasFile('imagem')) {
-            $data['imagem'] = $request->file('imagem')->store('ocorrencias', 'public');
+            $image = $request->file('imagem');
+            $filename = time() . '.webp';
+    
+            $imageResized = Image::make($image)
+                ->resize(1024, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                })
+                ->encode('webp', 80);
+    
+            Storage::disk('public')->put("ocorrencias/{$filename}", $imageResized);
+            $data['imagem'] = "ocorrencias/{$filename}";
         }
     
         $ocorrencia->update($data);
     
         return redirect()->route('ocorrencias.index')->with('success', 'Ocorrência atualizada com sucesso!');
-    }
-
-    public function destroy(Ocorrencia $ocorrencia) {
-        // Verifica se o usuário autenticado é o autor da ocorrência
-        if ($ocorrencia->user_id !== auth()->id()) {
-            return redirect()->route('ocorrencias.index')->with('error', 'Você não tem permissão para excluir esta ocorrência.');
-        }
-
-        $ocorrencia->delete();
-    
-        return redirect()->route('ocorrencias.index')->with('success', 'Ocorrência removida com sucesso!');
     }
 }
