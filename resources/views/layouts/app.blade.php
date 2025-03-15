@@ -13,64 +13,23 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:type" content="website">
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="UaiResolve - Nossa cidade, nosso compromisso">
-    <meta name="twitter:description" content="Juntos, podemos melhorar nossa cidade! Registre ocorrências e colabore para um ambiente melhor.">
-    <meta name="twitter:image" content="{{ asset('images/preview.png') }}">
-
-    <!-- Link do Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
-    <!-- Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
-
-    <!-- DataTables CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
-
     <!-- Manifesto -->
     <link rel="manifest" href="/manifest.json">
 </head>
 
 <body>
     <div class="">
-      @include('layouts.nav')
-        
-        @yield('content') <!-- Aqui vai o conteúdo das páginas -->
-        <style>
-    nav{
-    border-radius: 0rem 0rem 1.5rem 1.5rem;
-}
-</style>
+        @include('layouts.nav')
+        @yield('content')
     </div>
 
-    <!-- jQuery (necessário para o DataTables e Select2) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-
-    <!-- DataTables JS -->
-    <script src="https://cdn.jsdelivr.net/npm/datatables.net/js/jquery.dataTables.min.js"></script>
-
-    <!-- Chart.js JS -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    @yield('scripts') <!-- Scripts específicos da página -->
-    
     <!-- Registrar o Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-                console.log('Service Worker registrado com sucesso:', registration.scope);
-            }).catch(function(error) {
-                console.log('Falha ao registrar o Service Worker:', error);
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('Service Worker registrado:', reg.scope))
+                    .catch(err => console.log('Erro no registro do Service Worker:', err));
             });
         }
     </script>
@@ -93,14 +52,13 @@
             installButton.style.right = '20px';
             installButton.style.zIndex = '1000';
             installButton.style.padding = '12px 20px';
-            installButton.style.backgroundColor = '#618CC7';  // Cor azul da sua paleta
+            installButton.style.backgroundColor = '#618CC7';
             installButton.style.color = '#ffffff';
             installButton.style.border = 'none';
             installButton.style.borderRadius = '8px';
             installButton.style.cursor = 'pointer';
             installButton.style.fontSize = '16px';
 
-            // Adicionar o botão à tela
             document.body.appendChild(installButton);
 
             installButton.addEventListener('click', () => {
