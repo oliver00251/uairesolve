@@ -71,6 +71,25 @@
                         @empty
                             <p>Não há comentários ainda.</p>
                         @endforelse
+
+                        {{-- Se o usuário estiver logado, exibe o formulário de comentário --}}
+                        @auth
+                            <div class="comentarios-formulario mb-4">
+                                <h4>Deixe seu comentário:</h4>
+                                <form action="{{ route('comentarios.store', $ocorrencia->id) }}" method="POST">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <textarea name="comentario" class="form-control" rows="4" placeholder="Escreva seu comentário..." required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Comentar</button>
+                                </form>
+                            </div>
+                        @endauth
+
+                        {{-- Se o usuário não estiver logado, exibe uma mensagem pedindo para fazer login --}}
+                        @guest
+                            <p>Para comentar, você precisa <a href="{{ route('login') }}">fazer login</a>.</p>
+                        @endguest
                     </div>
                 </div>
             </div>
@@ -88,7 +107,7 @@
                 <div class="modal-body text-center">
                     <!-- Imagem gerada será exibida aqui -->
                     <img id="imagemGeradaModal" src="" alt="Imagem Gerada" class="img-fluid mb-3" style="max-height: 300px; max-width: 100%;">
-                    
+
                     <!-- Botão de download da imagem -->
                     <div class="mt-3">
                         <button id="btnDownloadImagem" class="btn btn-success">

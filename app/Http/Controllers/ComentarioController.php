@@ -11,7 +11,7 @@ class ComentarioController extends Controller {
         $request->validate([
             'comentario' => 'required|string|max:1000',
         ]);
-        //dd(auth()->id());
+    
         $ocorrencia->comentarios()->create([
             'user_id' => auth()->id(),
             'comentario' => $request->comentario,
