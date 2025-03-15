@@ -1,197 +1,200 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6 exibir_conteudo">
-            {{-- Card de Ocorrência --}}
-            <div class="card shadow-sm p-4" id="ocorrenciaCard">
-                {{-- Ícone de voltar --}}
-                <div class="d-flex align-items-center mb-4">
-                    <a href="{{ route('ocorrencias.index') }}" class="text-decoration-none text-dark">
-                        <i class="fas fa-arrow-left fa-lg"></i>
-                    </a>
-                    <h2 class="ms-2 mb-0 fs-5 fs-md-3">Detalhes da {{ $tituloOcorrencia }}</h2>
-                </div>
-
-                {{-- Detalhes da ocorrência --}}
-                <div class="mb-3">
-                    <p><strong>Título:</strong> <span class="text-muted">{{ $ocorrencia->titulo }}</span></p>
-                    <p><strong>Descrição:</strong> <span class="text-muted">{{ $ocorrencia->descricao }}</span></p>
-                    <p class="{{ $ocorrencia->tipo != 'O' ? 'd-none' : '' }}">
-                        <strong>Localização:</strong> <span class="text-muted">{{ $ocorrencia->localizacao }}</span>
-                    </p>
-                    <p><strong>Publicado em:</strong> <span class="text-muted">
-                        {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
-                    </span></p>
-                </div>
-
-                @if($ocorrencia->imagem)
-                    <div class="text-center my-4">
-                        <img src="{{ asset('storage/' . $ocorrencia->imagem) }}" class="img-fluid ocorrencia-img shadow">
-                    </div>
-                @endif
-
-                <hr>
-
-                {{-- Botão de Editar (Somente visível para o usuário que publicou a ocorrência) --}}
-                @if(Auth::check() && Auth::user()->id === $ocorrencia->user_id)
-                    <div class="d-flex justify-content-end" id="btnEditarOcorrencia">
-                        <a href="{{ route('ocorrencias.edit', $ocorrencia->id) }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-edit"></i> Editar Ocorrência
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6 exibir_conteudo">
+                {{-- Card de Ocorrência --}}
+                <div class="card shadow-sm p-4" id="ocorrenciaCard">
+                    {{-- Ícone de voltar --}}
+                    <div class="d-flex align-items-center mb-4">
+                        <a href="{{ route('ocorrencias.index') }}" class="text-decoration-none text-dark">
+                            <i class="fas fa-arrow-left fa-lg"></i>
                         </a>
+                        <h2 class="ms-2 mb-0 fs-5 fs-md-3">Detalhes da {{ $tituloOcorrencia }}</h2>
                     </div>
-                    <hr>
-                @endif
 
-                {{-- Ícone de Compartilhar --}}
-                <div class="d-flex justify-content-center mb-3" id="btnCompartilharContainer">
-                    <button id="btnCompartilhar" class="btn btn-secondary">
-                        <i class="fas fa-share-alt"></i> Compartilhar Ocorrência
-                    </button>
-                </div>
+                    {{-- Detalhes da ocorrência --}}
+                    <div class="mb-3">
+                        <p><strong>Título:</strong> <span class="text-muted">{{ $ocorrencia->titulo }}</span></p>
+                        <p><strong>Descrição:</strong> <span class="text-muted">{{ $ocorrencia->descricao }}</span></p>
+                        <p class="{{ $ocorrencia->tipo != 'O' ? 'd-none' : '' }}">
+                            <strong>Localização:</strong> <span class="text-muted">{{ $ocorrencia->localizacao }}</span>
+                        </p>
+                        <p><strong>Publicado em:</strong> <span class="text-muted">
+                                {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
+                            </span></p>
+                    </div>
 
-                <hr>
-
-                {{-- Seção de Comentários --}}
-                <div class="comentarios-secao">
-                    <h3 class="mb-3">Comentários</h3>
-
-                    {{-- Lista de Comentários --}}
-                    @forelse ($ocorrencia->comentarios as $comentario)
-                        <div class="mb-3 border p-4 rounded bg-light shadow-sm">
-                            <p><strong>{{ $comentario->usuario->name ?? 'Usuário Anônimo' }}</strong> comentou:</p>
-                            <p>{{ $comentario->comentario }}</p>
-                            <small class="text-muted">
-                                {{ $comentario->created_at->diffForHumans() }} ({{ $comentario->created_at->format('d/m/Y H:i') }})
-                            </small>
+                    {{-- Imagem da ocorrência --}}
+                    @if ($ocorrencia->imagem)
+                        <div class="text-center my-4">
+                            <img src="{{ asset('storage/' . $ocorrencia->imagem) }}" class="img-fluid ocorrencia-img shadow">
                         </div>
-                    @empty
-                        <p>Não há comentários ainda.</p>
-                    @endforelse
+                    @endif
+
+                    <hr>
+
+                    {{-- Botão de Editar (Somente para o dono da ocorrência) --}}
+                    @if (Auth::check() && Auth::user()->id === $ocorrencia->user_id)
+                        <div class="d-flex justify-content-end" id="btnEditarOcorrencia">
+                            <a href="{{ route('ocorrencias.edit', $ocorrencia->id) }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> Editar Ocorrência
+                            </a>
+                        </div>
+                        <hr>
+                    @endif
+
+                    {{-- Botão de Compartilhar --}}
+                    <div class="d-flex justify-content-center mb-3" id="btnCompartilharContainer">
+                        <button id="btnCompartilhar" class="btn btn-secondary">
+                            <i class="fas fa-share-alt"></i> Compartilhar Ocorrência
+                        </button>
+                    </div>
+
+                    <hr>
+
+                    {{-- Seção de Comentários --}}
+                    <div class="comentarios-secao">
+                        <h3 class="mb-3">Comentários</h3>
+
+                        {{-- Lista de Comentários --}}
+                        @forelse ($ocorrencia->comentarios as $comentario)
+                            <div class="mb-3 border p-4 rounded bg-light shadow-sm">
+                                <p><strong>{{ $comentario->usuario->name ?? 'Usuário Anônimo' }}</strong> comentou:</p>
+                                <p>{{ $comentario->comentario }}</p>
+                                <small class="text-muted">
+                                    {{ $comentario->created_at->diffForHumans() }}
+                                    ({{ $comentario->created_at->format('d/m/Y H:i') }})
+                                </small>
+                            </div>
+                        @empty
+                            <p>Não há comentários ainda.</p>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-{{-- CSS para formatação no print --}}
-<style>
-    .ocorrencia-img {
-        width: 85%;
-        max-width: 900px;
-        object-fit: cover;
-        border-radius: 15px;
-        border: 8px solid white;
-        margin-top: 20px;
-    }
+    {{-- CSS para formatação no print --}}
+    <style>
+        .ocorrencia-img {
+            width: 85%;
+            max-width: 900px;
+            object-fit: cover;
+            border-radius: 15px;
+            border: 8px solid white;
+            margin-top: 20px;
+        }
 
-    /* Estilos aplicados SOMENTE no print */
-    .print-mode {
-        width: 1080px;
-        height: 1920px;
-        background: linear-gradient(to bottom, #0D6EFD, #1A73E8);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 60px;
-        text-align: center;
-        color: white;
-        font-family: 'Arial', sans-serif;
-        border-radius: 20px;
-    }
+        /* Estilos aplicados SOMENTE no print */
+        .print-mode {
+            width: 1080px;
+            height: 1920px;
+            background: linear-gradient(to bottom, #0D6EFD, #90b2df);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            border-radius: 0px;
+        }
 
-    .print-mode h2 {
-        font-size: 64px;
-        font-weight: 800;
-        text-transform: uppercase;
-    }
+        .print-mode h2 {
+            font-size: 85px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 2rem;
+            background: orange;
+            margin: 4rem;
+            border-radius: 1rem;
+        }
 
-    .print-mode p {
-        font-size: 42px;
-        max-width: 85%;
-        margin-bottom: 30px;
-        font-weight: 500;
-    }
+        .print-mode p {
+            font-size: 58px;
+            max-width: 84%;
+            margin-bottom: 30px;
+            font-weight: 500;
+            text-align: left;
+        }
 
-    .print-mode .ocorrencia-img {
-        width: 90%;
-        max-width: 900px;
-        height: auto;
-    }
-    .exibir_conteudo {
-    padding: 5.7rem 0.3rem;
-}
+        .print-mode .ocorrencia-img {
+            width: 90%;
+            max-width: 900px;
+            height: auto;
+        }
 
-@media (min-width: 768px) { /* Aplica para telas maiores que 768px (Tablets e Desktop) */
-    .exibir_conteudo {
-        padding: 5.7rem 0rem;
-    }
-}
+        .exibir_conteudo {
+            padding: 5.7rem 0.3rem;
+        }
 
-</style>
+        @media (min-width: 768px) {
+            .exibir_conteudo {
+                padding: 5.7rem 0rem;
+            }
+        }
+    </style>
 
-{{-- JavaScript para Capturar e Compartilhar a Imagem --}}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script>
-    document.getElementById('btnCompartilhar').addEventListener('click', function () {
-        let card = document.getElementById('ocorrenciaCard');
-        let comentarios = document.querySelector('.comentarios-secao');
-        let btnCompartilharContainer = document.getElementById('btnCompartilharContainer');
-        let btnEditarOcorrencia = document.getElementById('btnEditarOcorrencia');
+    {{-- JavaScript para Capturar e Compartilhar a Imagem --}}
+    <script>
+        document.getElementById('btnCompartilhar').addEventListener('click', function() {
+            let comentarios = document.querySelector('.comentarios-secao');
+            let btnCompartilharContainer = document.getElementById('btnCompartilharContainer');
+            let btnEditarOcorrencia = document.getElementById('btnEditarOcorrencia');
 
-        // Ocultar comentários, botão de compartilhar e botão de editar antes da captura
-        if (comentarios) comentarios.style.display = 'none';
-        if (btnCompartilharContainer) btnCompartilharContainer.style.display = 'none';
-        if (btnEditarOcorrencia) btnEditarOcorrencia.style.display = 'none';
+            // Ocultar elementos antes do print
+            if (comentarios) comentarios.style.display = 'none';
+            if (btnCompartilharContainer) btnCompartilharContainer.style.display = 'none';
+            if (btnEditarOcorrencia) btnEditarOcorrencia.style.display = 'none';
 
-        // Criar um container temporário para o print
-        let printDiv = document.createElement('div');
-        printDiv.classList.add('print-mode');
+            // Criar um container temporário para o print
+            let printDiv = document.createElement('div');
+            printDiv.classList.add('print-mode');
 
-        // Criar elementos para o print
-        let title = document.createElement('h2');
-        title.innerText = "📢 Detalhes da Ocorrência";
+            // Criar título
+            let title = document.createElement('h2');
+            title.innerText = "📢 Atenção";
 
-        let details = document.createElement('p');
-        details.innerHTML = `
-            <strong>Título:</strong> {{ $ocorrencia->titulo }} <br>
-            <strong>Descrição:</strong> {{ $ocorrencia->descricao }} <br>
-            <strong>Localização:</strong> {{ $ocorrencia->localizacao }} <br>
-            <strong>Publicado em:</strong> {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
-        `;
+            // Criar detalhes
+            let details = document.createElement('p');
+            details.innerHTML = `
+                <strong>Título:</strong> {{ $ocorrencia->titulo }} <br>
+                <strong>Descrição:</strong> {{ $ocorrencia->descricao }} <br>
+                <strong>Localização:</strong> {{ $ocorrencia->localizacao }} <br>
+                <strong>Publicado em:</strong> {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
+            `;
 
-        let img = document.createElement('img');
-        img.src = "{{ asset('storage/' . $ocorrencia->imagem) }}";
-        img.classList.add('ocorrencia-img');
+            // Criar imagem
+            let img = document.createElement('img');
+            img.src = "{{ asset('storage/' . $ocorrencia->imagem) }}";
+            img.classList.add('ocorrencia-img');
 
-        // Adicionar elementos ao container
-        printDiv.appendChild(title);
-        printDiv.appendChild(details);
-        if (img.src) printDiv.appendChild(img);
+            // Adicionar elementos ao printDiv
+            printDiv.appendChild(title);
+            printDiv.appendChild(details);
+            if (img.src) printDiv.appendChild(img);
 
-        // Adicionar ao body e capturar imagem
-        document.body.appendChild(printDiv);
+            // Adicionar ao body e capturar imagem
+            document.body.appendChild(printDiv);
 
-        html2canvas(printDiv, { scale: 2 }).then(canvas => {
-            let imgData = canvas.toDataURL('image/png');
+            html2canvas(printDiv, { scale: 2 }).then(canvas => {
+                let imgData = canvas.toDataURL('image/png');
+                document.body.removeChild(printDiv);
 
-            // Remover div temporária
-            document.body.removeChild(printDiv);
+                // Restaurar elementos ocultos
+                if (comentarios) comentarios.style.display = 'block';
+                if (btnCompartilharContainer) btnCompartilharContainer.style.display = 'flex';
+                if (btnEditarOcorrencia) btnEditarOcorrencia.style.display = 'flex';
 
-            // Exibir novamente os elementos ocultos
-            if (comentarios) comentarios.style.display = 'block';
-            if (btnCompartilharContainer) btnCompartilharContainer.style.display = 'flex';
-            if (btnEditarOcorrencia) btnEditarOcorrencia.style.display = 'flex';
-
-            // Criar um link para baixar a imagem
-            let link = document.createElement('a');
-            link.href = imgData;
-            link.download = 'ocorrencia_story.png';
-            link.click();
+                // Criar link para baixar a imagem
+                let link = document.createElement('a');
+                link.href = imgData;
+                link.download = 'ocorrencia_story.png';
+                link.click();
+            });
         });
-    });
-</script>
-
+    </script>
 @endsection
