@@ -77,6 +77,29 @@
         </div>
     </div>
 
+    {{-- Modal de Visualização da Imagem e Download --}}
+    <div class="modal fade" id="modalCompartilhar" tabindex="-1" aria-labelledby="modalCompartilharLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCompartilharLabel">Visualização da Ocorrência</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <!-- Imagem gerada será exibida aqui -->
+                    <img id="imagemGeradaModal" src="" alt="Imagem Gerada" class="img-fluid mb-3" style="max-height: 300px; max-width: 100%;">
+                    
+                    <!-- Botão de download da imagem -->
+                    <div class="mt-3">
+                        <button id="btnDownloadImagem" class="btn btn-success">
+                            <i class="fas fa-download"></i> Baixar Imagem
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- CSS para formatação no print --}}
     <style>
         .ocorrencia-img {
@@ -138,7 +161,7 @@
         }
     </style>
 
-    {{-- JavaScript para Capturar e Compartilhar a Imagem --}}
+    {{-- JavaScript para Capturar e Exibir a Imagem com Botão de Download --}}
     <script>
         document.getElementById('btnCompartilhar').addEventListener('click', function() {
             let comentarios = document.querySelector('.comentarios-secao');
@@ -158,11 +181,16 @@
             let title = document.createElement('h2');
             title.innerText = "📢 Atenção";
 
+            // Limitar a descrição às 14 primeiras palavras e adicionar a sugestão
+            let descricao = "{{ $ocorrencia->descricao }}";
+            let palavras = descricao.split(' '); // Divide a descrição em palavras
+            let descricaoLimitada = palavras.slice(0, 14).join(' ') + (palavras.length > 14 ? '... Veja mais em uairesolve.com.br' : '');
+
             // Criar detalhes
             let details = document.createElement('p');
             details.innerHTML = `
                 <strong>Título:</strong> {{ $ocorrencia->titulo }} <br>
-                <strong>Descrição:</strong> {{ $ocorrencia->descricao }} <br>
+                <strong>Descrição:</strong> ${descricaoLimitada} <br>
                 <strong>Localização:</strong> {{ $ocorrencia->localizacao }} <br>
                 <strong>Publicado em:</strong> {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
             `;
@@ -180,20 +208,28 @@
             // Adicionar ao body e capturar imagem
             document.body.appendChild(printDiv);
 
+            // Agora que a div está no DOM, podemos capturar a imagem
             html2canvas(printDiv, { scale: 2 }).then(canvas => {
                 let imgData = canvas.toDataURL('image/png');
                 document.body.removeChild(printDiv);
 
                 // Restaurar elementos ocultos
                 if (comentarios) comentarios.style.display = 'block';
-                if (btnCompartilharContainer) btnCompartilharContainer.style.display = 'flex';
                 if (btnEditarOcorrencia) btnEditarOcorrencia.style.display = 'flex';
 
-                // Criar link para baixar a imagem
-                let link = document.createElement('a');
-                link.href = imgData;
-                link.download = 'ocorrencia_story.png';
-                link.click();
+                // Exibir o modal com a imagem gerada
+                let modal = new bootstrap.Modal(document.getElementById('modalCompartilhar'));
+                let imgModal = document.getElementById('imagemGeradaModal');
+                imgModal.src = imgData;
+                modal.show(); // Exibe o modal
+
+                // Adicionar opção de download da imagem
+                document.getElementById('btnDownloadImagem').addEventListener('click', function() {
+                    let link = document.createElement('a');
+                    link.href = imgData;
+                    link.download = 'ocorrencia.png'; // Nome do arquivo de download
+                    link.click();
+                });
             });
         });
     </script>
