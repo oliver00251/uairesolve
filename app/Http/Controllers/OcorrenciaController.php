@@ -44,7 +44,7 @@ class OcorrenciaController extends Controller
 
     public function store(Request $request)
     {
-        //dd($request->all());
+       
         $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'required|string',

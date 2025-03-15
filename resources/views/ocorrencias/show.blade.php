@@ -121,12 +121,12 @@
         height: auto;
     }
     .exibir_conteudo {
-    padding: 5.7rem 1.5rem;
+    padding: 5.7rem 0.3rem;
 }
 
 @media (min-width: 768px) { /* Aplica para telas maiores que 768px (Tablets e Desktop) */
     .exibir_conteudo {
-        padding: 6rem;
+        padding: 5.7rem 0rem;
     }
 }
 
