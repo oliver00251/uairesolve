@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Ocorrencia;
 use App\Models\OcorrenciaLog;
 use Illuminate\Http\Request;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Illuminate\Support\Facades\Storage;
 
 class OcorrenciaController extends Controller
@@ -48,13 +49,15 @@ class OcorrenciaController extends Controller
         if ($request->hasFile('imagem')) {
             $image = $request->file('imagem');
             $filename = time() . '.webp';
-    
-            $imageResized = Image::make($image)
-                ->resize(1024, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                })
-                ->encode('webp', 80);
-    
+
+            // Criar instância do ImageManager com o driver GD
+            $manager = new ImageManager(new GdDriver());
+
+            // Processar a imagem
+            $imageResized = $manager->read($image->getRealPath())
+                ->scale(width: 1024) // Redimensionar mantendo proporção
+                ->toWebp(80); // Converter para WebP com qualidade 80%
+
             Storage::disk('public')->put("ocorrencias/{$filename}", $imageResized);
             $data['imagem'] = "ocorrencias/{$filename}";
         }
@@ -101,13 +104,15 @@ class OcorrenciaController extends Controller
         if ($request->hasFile('imagem')) {
             $image = $request->file('imagem');
             $filename = time() . '.webp';
-    
-            $imageResized = Image::make($image)
-                ->resize(1024, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                })
-                ->encode('webp', 80);
-    
+
+            // Criar instância do ImageManager com o driver GD
+            $manager = new ImageManager(new GdDriver());
+
+            // Processar a imagem
+            $imageResized = $manager->read($image->getRealPath())
+                ->scale(width: 1024) // Redimensionar mantendo proporção
+                ->toWebp(80); // Converter para WebP com qualidade 80%
+
             Storage::disk('public')->put("ocorrencias/{$filename}", $imageResized);
             $data['imagem'] = "ocorrencias/{$filename}";
         }
