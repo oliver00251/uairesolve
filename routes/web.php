@@ -5,6 +5,8 @@ use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\OcorrenciaController;
 use App\Http\Controllers\OcorrenciaLikeController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
+
 
 /*
 |-------------------------------------------------------------------------- 
@@ -20,6 +22,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('auth/redirect/google', [AuthController::class, 'redirectToGoogle']);
+Route::get('auth/callback/google', [AuthController::class, 'handleGoogleCallback']);
+
 
 # Ocorrencias
 Route::resource('ocorrencias', OcorrenciaController::class)->except(['show']);  // Excluímos a rota 'show' da resource para evitar conflito.

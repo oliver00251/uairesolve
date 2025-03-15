@@ -8,9 +8,47 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
+
+
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+
+            // Verifica se o usuário já existe no banco de dados
+            $existingUser = User::where('email', $googleUser->getEmail())->first();
+
+            if ($existingUser) {
+                // Se o usuário existe, loga ele
+                auth()->login($existingUser, true);
+            } else {
+                // Cria um novo usuário
+                $newUser = User::create([
+                    'name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
+                    // Outros campos conforme necessário
+                ]);
+
+                // Loga o novo usuário
+                auth()->login($newUser, true);
+            }
+
+            return redirect('/dashboard');  // Redireciona para o dashboard após o login
+
+        } catch (\Exception $e) {
+            return redirect('/login')->with('error', 'Erro ao tentar fazer login com o Google.');
+        }
+    }
     /**
      * Exibir a tela de login.
      */
