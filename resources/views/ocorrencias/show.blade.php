@@ -1,45 +1,45 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
+<div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6 exibir_conteudo">
+        <div class="col-12 col-md-8 col-lg-6">
             {{-- Card de Ocorrência --}}
-            <div class="card shadow-sm p-4" id="ocorrenciaCard">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden" id="ocorrenciaCard">
                 
-                {{-- Cabeçalho do Card com a Imagem --}}
-                <div class="card-header p-0 mb-4 position-relative">
-                    @if($ocorrencia->imagem)
-                    <img src="{{ asset('storage/' . $ocorrencia->imagem) }}" class="img-fluid card-img-top" alt="Imagem da Ocorrência" />
-                    @endif
+                {{-- Cabeçalho do Card com Imagem --}}
+                @if($ocorrencia->imagem)
+                <div class="position-relative">
+                    <img src="{{ asset('storage/' . $ocorrencia->imagem) }}" class="img-fluid w-100 card-img-top" alt="Imagem da Ocorrência">
                 </div>
+                @endif
 
                 {{-- Corpo do Card --}}
-                <div class="card-body">
+                <div class="card-body p-4">
                     {{-- Ícone de voltar --}}
-                    <div class="d-flex align-items-center mb-4">
+                    <div class="d-flex align-items-center mb-3">
                         <a href="{{ route('ocorrencias.index') }}" class="text-decoration-none text-dark">
                             <i class="fas fa-arrow-left fa-lg"></i>
                         </a>
-                        <h2 class="ms-2 mb-0 fs-5 fs-md-3">Detalhes da {{ $tituloOcorrencia }}</h2>
+                        <h2 class="ms-2 mb-0 fs-5 fw-bold">Detalhes da {{ $tituloOcorrencia }}</h2>
                     </div>
 
-                    {{-- Detalhes da ocorrência --}}
-                    <div class="mb-3">
-                        <p><strong>Título:</strong> <span class="text-muted">{{ $ocorrencia->titulo }}</span></p>
-                        <p><strong>Descrição:</strong> <span class="text-muted">{{ $ocorrencia->descricao }}</span></p>
-                        <p class="{{ $ocorrencia->tipo != 'O' ? 'd-none' : '' }}">
-                            <strong>Localização:</strong> <span class="text-muted">{{ $ocorrencia->localizacao }}</span>
-                        </p>
-                        <p><strong>Publicado em:</strong> <span class="text-muted">
+                    {{-- Detalhes da Ocorrência --}}
+                    <div class="mb-4">
+                        <p><strong class="text-primary">Título:</strong> <span class="text-muted">{{ $ocorrencia->titulo }}</span></p>
+                        <p><strong class="text-primary">Descrição:</strong> <span class="text-muted">{{ $ocorrencia->descricao }}</span></p>
+                        @if($ocorrencia->tipo == 'O')
+                        <p><strong class="text-primary">Localização:</strong> <span class="text-muted">{{ $ocorrencia->localizacao }}</span></p>
+                        @endif
+                        <p><strong class="text-primary">Publicado em:</strong> <span class="text-muted">
                             {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
                         </span></p>
                     </div>
 
                     {{-- Botão de Compartilhar --}}
-                    <div class="d-flex justify-content-center mb-3">
-                        <button id="btnCompartilhar" class="btn btn-secondary">
-                            <i class="fas fa-share-alt"></i> Compartilhar Ocorrência
+                    <div class="d-flex justify-content-center">
+                        <button id="btnCompartilhar" class="btn btn-outline-primary rounded-pill px-4">
+                            <i class="fas fa-share-alt"></i> Compartilhar
                         </button>
                     </div>
                 </div>
@@ -48,109 +48,36 @@
     </div>
 </div>
 
-{{-- CSS para formatação no print --}}
+{{-- Estilos Personalizados --}}
 <style>
     .card-img-top {
-        border-radius: 15px 15px 0 0;
         object-fit: cover;
-        height: 200px; /* Ajuste o tamanho da imagem */
+        height: 220px;
+        border-radius: 8px 8px 0 0;
     }
 
-    /* Estilos aplicados SOMENTE no print */
-    .print-mode {
-        width: 1080px;
-        height: 1920px;
-        background: linear-gradient(to bottom, #0D6EFD, #1A73E8);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 60px;
-        text-align: center;
+    .btn-outline-primary {
+        transition: 0.3s ease-in-out;
+    }
+
+    .btn-outline-primary:hover {
+        background: #0D6EFD;
         color: white;
-        font-family: 'Arial', sans-serif;
-        border-radius: 20px;
-    }
-
-    .print-mode h2 {
-        font-size: 64px;
-        font-weight: 800;
-        text-transform: uppercase;
-    }
-
-    .print-mode p {
-        font-size: 42px;
-        max-width: 85%;
-        margin-bottom: 30px;
-        font-weight: 500;
-    }
-
-    .print-mode .ocorrencia-img {
-        width: 90%;
-        max-width: 900px;
-        height: auto;
     }
 </style>
 
-{{-- JavaScript para Capturar e Compartilhar a Imagem --}}
+{{-- Script de Compartilhamento --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
     document.getElementById('btnCompartilhar').addEventListener('click', function () {
         let card = document.getElementById('ocorrenciaCard');
 
-        // Criar um container temporário para o print
-        let printDiv = document.createElement('div');
-        printDiv.classList.add('print-mode');
-
-        // Criar elementos para o print
-        let title = document.createElement('h2');
-        title.innerText = "📢 Detalhes da Ocorrência";
-
-        let details = document.createElement('p');
-        details.innerHTML = `
-            <strong>Título:</strong> {{ $ocorrencia->titulo }} <br>
-            <strong>Descrição:</strong> {{ $ocorrencia->descricao }} <br>
-            <strong>Localização:</strong> {{ $ocorrencia->localizacao }} <br>
-            <strong>Publicado em:</strong> {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
-        `;
-
-        let img = document.createElement('img');
-        img.src = "{{ asset('storage/' . $ocorrencia->imagem) }}";
-        img.classList.add('ocorrencia-img');
-
-        // Adicionar elementos ao container
-        printDiv.appendChild(title);
-        printDiv.appendChild(details);
-        if (img.src) printDiv.appendChild(img);
-
-        // Adicionar ao body e capturar imagem
-        document.body.appendChild(printDiv);
-
-        html2canvas(printDiv, { scale: 2 }).then(canvas => {
+        html2canvas(card, { scale: 2 }).then(canvas => {
             let imgData = canvas.toDataURL('image/png');
-            
-            // Remover div temporária
-            document.body.removeChild(printDiv);
-
-            // Criar um link para baixar a imagem
             let link = document.createElement('a');
             link.href = imgData;
             link.download = 'ocorrencia_story.png';
             link.click();
-
-            // Se o navegador suportar Web Share API, permitir compartilhamento direto
-            if (navigator.share) {
-                canvas.toBlob(blob => {
-                    let file = new File([blob], "ocorrencia_story.png", { type: "image/png" });
-                    let filesArray = [file];
-
-                    navigator.share({
-                        title: "Confira esta ocorrência!",
-                        text: "Veja essa ocorrência no UaiResolve.",
-                        files: filesArray
-                    }).catch(error => console.log('Erro ao compartilhar:', error));
-                });
-            }
         });
     });
 </script>
