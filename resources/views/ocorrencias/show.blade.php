@@ -1,12 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-8 col-lg-6 exibir_conteudo">
-                {{-- Card de Ocorrência --}}
-                <div class="card shadow-sm p-4" id="ocorrenciaCard">
-                    {{-- Ícone de voltar e título --}}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6 exibir_conteudo">
+            {{-- Card de Ocorrência --}}
+            <div class="card shadow-sm p-4" id="ocorrenciaCard">
+                
+                {{-- Cabeçalho do Card com a Imagem --}}
+                <div class="card-header p-0 mb-4 position-relative">
+                    @if($ocorrencia->imagem)
+                    <img src="{{ asset('storage/' . $ocorrencia->imagem) }}" class="img-fluid card-img-top" alt="Imagem da Ocorrência" />
+                    @endif
+                </div>
+
+                {{-- Corpo do Card --}}
+                <div class="card-body">
+                    {{-- Ícone de voltar --}}
                     <div class="d-flex align-items-center mb-4">
                         <a href="{{ route('ocorrencias.index') }}" class="text-decoration-none text-dark">
                             <i class="fas fa-arrow-left fa-lg"></i>
@@ -22,46 +32,127 @@
                             <strong>Localização:</strong> <span class="text-muted">{{ $ocorrencia->localizacao }}</span>
                         </p>
                         <p><strong>Publicado em:</strong> <span class="text-muted">
-                                {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
-                            </span></p>
+                            {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
+                        </span></p>
                     </div>
 
-                    {{-- Imagem da ocorrência --}}
-                    @if ($ocorrencia->imagem)
-                        <div class="text-center my-4">
-                            <img src="{{ asset('storage/' . $ocorrencia->imagem) }}" class="img-fluid ocorrencia-img shadow">
-                        </div>
-                    @endif
-
-                    <hr>
-
-                    {{-- Seção de Ações (Editar, Compartilhar, Curtir) --}}
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        {{-- Botão de Editar (Somente para o dono da ocorrência) --}}
-                        @if (Auth::check() && Auth::user()->id === $ocorrencia->user_id)
-                            <a href="{{ route('ocorrencias.edit', $ocorrencia->id) }}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-edit"></i> Editar Ocorrência
-                            </a>
-                        @endif
-
-                        {{-- Botão de Compartilhar --}}
-                        <button id="btnCompartilhar" class="btn btn-secondary btn-sm">
-                            <i class="fas fa-share-alt"></i> Compartilhar
+                    {{-- Botão de Compartilhar --}}
+                    <div class="d-flex justify-content-center mb-3">
+                        <button id="btnCompartilhar" class="btn btn-secondary">
+                            <i class="fas fa-share-alt"></i> Compartilhar Ocorrência
                         </button>
-
-                        {{-- Like/Deslike da Ocorrência --}}
-                        @include('ocorrencias.btn-curtir')
                     </div>
-
-                    <hr>
-
-                    {{-- Seção de Comentários --}}
-                    @include('ocorrencias.comentarios')
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    {{-- Modal de Compartilhar --}}
-    @include('ocorrencias.modal-compartilhar')
+{{-- CSS para formatação no print --}}
+<style>
+    .card-img-top {
+        border-radius: 15px 15px 0 0;
+        object-fit: cover;
+        height: 200px; /* Ajuste o tamanho da imagem */
+    }
+
+    /* Estilos aplicados SOMENTE no print */
+    .print-mode {
+        width: 1080px;
+        height: 1920px;
+        background: linear-gradient(to bottom, #0D6EFD, #1A73E8);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 60px;
+        text-align: center;
+        color: white;
+        font-family: 'Arial', sans-serif;
+        border-radius: 20px;
+    }
+
+    .print-mode h2 {
+        font-size: 64px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .print-mode p {
+        font-size: 42px;
+        max-width: 85%;
+        margin-bottom: 30px;
+        font-weight: 500;
+    }
+
+    .print-mode .ocorrencia-img {
+        width: 90%;
+        max-width: 900px;
+        height: auto;
+    }
+</style>
+
+{{-- JavaScript para Capturar e Compartilhar a Imagem --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+    document.getElementById('btnCompartilhar').addEventListener('click', function () {
+        let card = document.getElementById('ocorrenciaCard');
+
+        // Criar um container temporário para o print
+        let printDiv = document.createElement('div');
+        printDiv.classList.add('print-mode');
+
+        // Criar elementos para o print
+        let title = document.createElement('h2');
+        title.innerText = "📢 Detalhes da Ocorrência";
+
+        let details = document.createElement('p');
+        details.innerHTML = `
+            <strong>Título:</strong> {{ $ocorrencia->titulo }} <br>
+            <strong>Descrição:</strong> {{ $ocorrencia->descricao }} <br>
+            <strong>Localização:</strong> {{ $ocorrencia->localizacao }} <br>
+            <strong>Publicado em:</strong> {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
+        `;
+
+        let img = document.createElement('img');
+        img.src = "{{ asset('storage/' . $ocorrencia->imagem) }}";
+        img.classList.add('ocorrencia-img');
+
+        // Adicionar elementos ao container
+        printDiv.appendChild(title);
+        printDiv.appendChild(details);
+        if (img.src) printDiv.appendChild(img);
+
+        // Adicionar ao body e capturar imagem
+        document.body.appendChild(printDiv);
+
+        html2canvas(printDiv, { scale: 2 }).then(canvas => {
+            let imgData = canvas.toDataURL('image/png');
+            
+            // Remover div temporária
+            document.body.removeChild(printDiv);
+
+            // Criar um link para baixar a imagem
+            let link = document.createElement('a');
+            link.href = imgData;
+            link.download = 'ocorrencia_story.png';
+            link.click();
+
+            // Se o navegador suportar Web Share API, permitir compartilhamento direto
+            if (navigator.share) {
+                canvas.toBlob(blob => {
+                    let file = new File([blob], "ocorrencia_story.png", { type: "image/png" });
+                    let filesArray = [file];
+
+                    navigator.share({
+                        title: "Confira esta ocorrência!",
+                        text: "Veja essa ocorrência no UaiResolve.",
+                        files: filesArray
+                    }).catch(error => console.log('Erro ao compartilhar:', error));
+                });
+            }
+        });
+    });
+</script>
+
 @endsection
