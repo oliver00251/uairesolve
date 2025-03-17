@@ -1,5 +1,5 @@
- {{-- Modal de Visualização da Imagem e Download --}}
- <div class="modal fade" id="modalCompartilhar" tabindex="-1" aria-labelledby="modalCompartilharLabel" aria-hidden="true">
+{{-- Modal de Visualização da Imagem e Download --}}
+<div class="modal fade" id="modalCompartilhar" tabindex="-1" aria-labelledby="modalCompartilharLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -10,6 +10,7 @@
                 <!-- Imagem gerada será exibida aqui -->
                 <img id="imagemGeradaModal" src="" alt="Imagem Gerada" class="img-fluid mb-3" style="max-height: 300px; max-width: 100%;">
 
+             
                 <!-- Botão de download da imagem -->
                 <div class="mt-3">
                     <button id="btnDownloadImagem" class="btn btn-success">
@@ -48,17 +49,17 @@
     }
 
     .print-mode h2 {
-        font-size: 85px;
+        font-size: 50px;
         font-weight: 800;
         text-transform: uppercase;
         padding: 2rem;
         background: orange;
-        margin: 4rem;
+        margin: 2rem;
         border-radius: 1rem;
     }
 
     .print-mode p {
-        font-size: 58px;
+        font-size: 45px;
         max-width: 84%;
         margin-bottom: 30px;
         font-weight: 500;
@@ -98,22 +99,25 @@
         let printDiv = document.createElement('div');
         printDiv.classList.add('print-mode');
 
+        // Limitar título a 150 caracteres
+        let titulo = "{{ $ocorrencia->titulo }}";
+        let tituloLimitado = titulo.length > 150 ? titulo.substring(0, 150) + "..." : titulo;
+
         // Criar título
         let title = document.createElement('h2');
-        title.innerText = "📢 Atenção";
+        title.innerText = "📢 " + tituloLimitado;
 
-        // Limitar a descrição às 14 primeiras palavras e adicionar a sugestão
+        // Limitar descrição às 14 primeiras palavras
         let descricao = "{{ $ocorrencia->descricao }}";
-        let palavras = descricao.split(' '); // Divide a descrição em palavras
-        let descricaoLimitada = palavras.slice(0, 14).join(' ') + (palavras.length > 14 ? '... Veja mais em uairesolve.com.br' : '');
+        let palavras = descricao.split(' ');
+        let descricaoLimitada = palavras.slice(0, 25).join(' ') + (palavras.length > 25 ? "..." : "");
 
         // Criar detalhes
         let details = document.createElement('p');
         details.innerHTML = `
-            <strong>Título:</strong> {{ $ocorrencia->titulo }} <br>
-            <strong>Descrição:</strong> ${descricaoLimitada} <br>
+            <strong></strong> ${descricaoLimitada} <br>
             <strong>Localização:</strong> {{ $ocorrencia->localizacao }} <br>
-            <strong>Publicado em:</strong> {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
+            <strong>Publicado em:</strong> {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y') : 'Data não disponível' }}
         `;
 
         // Criar imagem
@@ -121,10 +125,19 @@
         img.src = "{{ asset('storage/' . $ocorrencia->imagem) }}";
         img.classList.add('ocorrencia-img');
 
+        // Criar o link "Veja o conteúdo completo..."
+        let linkCompleto = document.createElement('p');
+        linkCompleto.innerHTML = `
+            <a href="https://uairesolve.com.br" target="_blank" style="background: orange; padding: 10px 15px; color: white; text-decoration: none; border-radius: 5px; font-size: 45px;">
+                Veja o conteúdo completo em <br> uairesolve.com.br
+            </a>
+        `;
+
         // Adicionar elementos ao printDiv
         printDiv.appendChild(title);
         printDiv.appendChild(details);
         if (img.src) printDiv.appendChild(img);
+        printDiv.appendChild(linkCompleto); // Adiciona o link
 
         // Adicionar ao body e capturar imagem
         document.body.appendChild(printDiv);
@@ -148,7 +161,7 @@
             document.getElementById('btnDownloadImagem').addEventListener('click', function() {
                 let link = document.createElement('a');
                 link.href = imgData;
-                link.download = 'ocorrencia.png'; // Nome do arquivo de download
+                link.download = tituloLimitado + '.png'; // Nome do arquivo de download
                 link.click();
             });
         });
