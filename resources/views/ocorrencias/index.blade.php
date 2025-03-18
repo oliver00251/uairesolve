@@ -9,7 +9,7 @@
             <div class="col-md-6 mb-3">
                 <div class="card shadow-sm">
                     <div class="card-header  ">
-                        <h5>{{$ocorrencia->tipo != 'O' ? 'Sugestão  ' : 'Ocorrencia  '}}</h5>
+                        <h5>{{$ocorrencia->tipo != 'O' ? 'Sugestão  ' : 'Ocorrência  '}}</h5>
                     </div>
                     <div class="card-body">
                         <h5 class="card-title fw-bold">{{ $ocorrencia->titulo }}</h5>
