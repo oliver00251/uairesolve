@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;  // Certifique-se de que o namespace esteja correto
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
