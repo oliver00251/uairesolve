@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('access_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('ip_address');
-            $table->string('user_agent')->nullable();
+            $table->text('ip_address');
+            $table->text('user_agent')->nullable();
             $table->timestamp('access_time')->useCurrent();
             $table->timestamps();
         });
