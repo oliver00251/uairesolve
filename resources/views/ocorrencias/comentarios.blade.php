@@ -1,4 +1,4 @@
-<div class="comentarios-secao">
+<div class="comentarios-secao p-3">
     <h3 class="mb-3">Comentários</h3>
 
     {{-- Lista de Comentários --}}

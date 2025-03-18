@@ -8,9 +8,9 @@
             </div>
             <div class="modal-body text-center">
                 <!-- Imagem gerada será exibida aqui -->
-                <img id="imagemGeradaModal" src="" alt="Imagem Gerada" class="img-fluid mb-3" style="max-height: 300px; max-width: 100%;">
+                <img id="imagemGeradaModal" src="" alt="Imagem Gerada" class="img-fluid mb-3"
+                    style="max-height: 500px; max-width: 100%;">
 
-             
                 <!-- Botão de download da imagem -->
                 <div class="mt-3">
                     <button id="btnDownloadImagem" class="btn btn-success">
@@ -81,89 +81,118 @@
             padding: 5.7rem 0rem;
         }
     }
+    <style>
+        .card-custom {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            position: relative;
+        }
+        .card-header img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .title-banner {
+            position: absolute;
+            bottom: -10px;
+            left: 10px;
+            background: white;
+            color: #0056b3;
+            padding: 8px 12px;
+            font-weight: bold;
+            border-radius: 10px;
+            font-size: 1.1rem;
+        }
+        .card-body {
+            background: #0056b3;
+            color: white;
+            padding: 20px;
+        }
+        .divider {
+            height: 1px;
+            background: white;
+            margin: 20px 0;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+    </style>
 </style>
-
-{{-- JavaScript para Capturar e Exibir a Imagem com Botão de Download --}}
 <script>
-    document.getElementById('btnCompartilhar').addEventListener('click', function() {
-        let comentarios = document.querySelector('.comentarios-secao');
-        let btnCompartilharContainer = document.getElementById('btnCompartilharContainer');
-        let btnEditarOcorrencia = document.getElementById('btnEditarOcorrencia');
+   document.getElementById('btnCompartilhar').addEventListener('click', function() {
+    let comentarios = document.querySelector('.comentarios-secao');
+    let btnCompartilharContainer = document.getElementById('btnCompartilharContainer');
+    let btnEditarOcorrencia = document.getElementById('btnEditarOcorrencia');
 
-        // Ocultar elementos antes do print
-        if (comentarios) comentarios.style.display = 'none';
-        if (btnCompartilharContainer) btnCompartilharContainer.style.display = 'none';
-        if (btnEditarOcorrencia) btnEditarOcorrencia.style.display = 'none';
+    // Ocultar elementos antes do print
+    if (comentarios) comentarios.style.display = 'none';
+    if (btnCompartilharContainer) btnCompartilharContainer.style.display = 'none';
+    if (btnEditarOcorrencia) btnEditarOcorrencia.style.display = 'none';
 
-        // Criar um container temporário para o print
-        let printDiv = document.createElement('div');
-        printDiv.classList.add('print-mode');
+    // Criar um container temporário para o print com o conteúdo completo do card
+    let printDiv = document.createElement('div');
+    printDiv.style.width = "1080px";
+    printDiv.style.height = "1920px";
+    printDiv.style.display = "flex";
+    printDiv.style.flexDirection = "column";
+    printDiv.style.justifyContent = "space-between";
+    printDiv.style.alignItems = "stretch";
+    printDiv.style.backgroundColor = "#0056b3";
+    printDiv.style.color = "white";
+    printDiv.style.padding = "0";
 
-        // Limitar título a 150 caracteres
-        let titulo = "{{ $ocorrencia->titulo }}";
-        let tituloLimitado = titulo.length > 150 ? titulo.substring(0, 150) + "..." : titulo;
+    // Criar o conteúdo do card com formato ajustado para story
+    printDiv.innerHTML = `
+        <div class="card-custom" style="width: 100%; height: 100%; display: flex; flex-direction: column;">
+            <div class="card-header" style="position: relative; flex-shrink: 0; height: 50%; overflow: hidden;">
+                <img src="{{ asset('storage/' . $ocorrencia->imagem) }}" alt="Ocorrência" style="width: 100%; height: 100%; object-fit: cover;">
+                <div class="title-banner" style="position: absolute; bottom: 30px; left: 20px; background: rgba(0, 0, 0, 0.7); color: white; padding: 12px 16px; font-weight: bold; border-radius: 10px; font-size: 2.6rem;  z-index: 1000">
+                    {{ $ocorrencia->titulo }}
+                </div>
+            </div>
+            <div class="card-body" style="padding: 40px; text-align: left; flex-grow: 1;  z-index: 1">
+                <p style="font-size: 35px; font-weight: bold;">Publicado em</p>
+                <p style="font-size: 35px; font-weight: bold;">{{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y') : 'Data não disponível' }}</p>
+                <p style="font-size: 47px; line-height: 1.6;">{{ Str::limit($ocorrencia->descricao, 200) }}</p>
+                <p style="font-size: 35px; font-weight: bold; margin-top: 20px;">Localização: {{ $ocorrencia->localizacao }}</p>
+            </div>
+            <div class="card-footer " style="text-align: center; font-weight: bold; font-size: 55px; padding: 20px; background:#0056b3; color: #fff;">
+                uairesolve.com.br
+            </div>
+        </div>
+    `;
 
-        // Criar título
-        let title = document.createElement('h2');
-        title.innerText = "📢 " + tituloLimitado;
+    document.body.appendChild(printDiv);
 
-        // Limitar descrição às 14 primeiras palavras
-        let descricao = "{{ $ocorrencia->descricao }}";
-        let palavras = descricao.split(' ');
-        let descricaoLimitada = palavras.slice(0, 25).join(' ') + (palavras.length > 25 ? "..." : "");
+    html2canvas(printDiv, { scale: 2 }).then(canvas => {
+        let imgData = canvas.toDataURL('image/png');
+        document.body.removeChild(printDiv);
 
-        // Criar detalhes
-        let details = document.createElement('p');
-        details.innerHTML = `
-            <strong></strong> ${descricaoLimitada} <br>
-            <strong>Localização:</strong> {{ $ocorrencia->localizacao }} <br>
-            <strong>Publicado em:</strong> {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y') : 'Data não disponível' }}
-        `;
+        if (comentarios) comentarios.style.display = 'block';
+        if (btnCompartilharContainer) btnCompartilharContainer.style.display = 'flex';
+        if (btnEditarOcorrencia) btnEditarOcorrencia.style.display = 'flex';
 
-        // Criar imagem
-        let img = document.createElement('img');
-        img.src = "{{ asset('storage/' . $ocorrencia->imagem) }}";
-        img.classList.add('ocorrencia-img');
+        let imgModal = document.getElementById('imagemGeradaModal');
+        imgModal.src = imgData;
 
-        // Criar o link "Veja o conteúdo completo..."
-        let linkCompleto = document.createElement('p');
-        linkCompleto.innerHTML = `
-            <a href="https://uairesolve.com.br" target="_blank" style="background: orange; padding: 10px 15px; color: white; text-decoration: none; border-radius: 5px; font-size: 45px;">
-                Veja o conteúdo completo em <br> uairesolve.com.br
-            </a>
-        `;
+        let modal = new bootstrap.Modal(document.getElementById('modalCompartilhar'));
+        modal.show();
 
-        // Adicionar elementos ao printDiv
-        printDiv.appendChild(title);
-        printDiv.appendChild(details);
-        if (img.src) printDiv.appendChild(img);
-        printDiv.appendChild(linkCompleto); // Adiciona o link
-
-        // Adicionar ao body e capturar imagem
-        document.body.appendChild(printDiv);
-
-        // Agora que a div está no DOM, podemos capturar a imagem
-        html2canvas(printDiv, { scale: 2 }).then(canvas => {
-            let imgData = canvas.toDataURL('image/png');
-            document.body.removeChild(printDiv);
-
-            // Restaurar elementos ocultos
-            if (comentarios) comentarios.style.display = 'block';
-            if (btnEditarOcorrencia) btnEditarOcorrencia.style.display = 'flex';
-
-            // Exibir o modal com a imagem gerada
-            let modal = new bootstrap.Modal(document.getElementById('modalCompartilhar'));
-            let imgModal = document.getElementById('imagemGeradaModal');
-            imgModal.src = imgData;
-            modal.show(); // Exibe o modal
-
-            // Adicionar opção de download da imagem
-            document.getElementById('btnDownloadImagem').addEventListener('click', function() {
-                let link = document.createElement('a');
-                link.href = imgData;
-                link.download = tituloLimitado + '.png'; // Nome do arquivo de download
-                link.click();
-            });
+        document.getElementById('btnDownloadImagem').addEventListener('click', function() {
+            let link = document.createElement('a');
+            link.href = imgData;
+            link.download = "{{ Str::slug($ocorrencia->titulo) }}.png";
+            link.click();
         });
     });
+});
 </script>
