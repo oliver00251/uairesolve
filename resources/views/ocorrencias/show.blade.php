@@ -17,7 +17,8 @@
                     {{-- Detalhes da ocorrência --}}
                     <div class="mb-3">
                         <p><strong>Título:</strong> <span class="text-muted">{{ $ocorrencia->titulo }}</span></p>
-                        <p><strong>Descrição:</strong> <span class="text-muted">{{ $ocorrencia->descricao }}</span></p>
+                        <p><strong>Descrição:</strong> <span class="text-muted">{!! nl2br(e($ocorrencia->descricao)) !!}</span></p>
+
                         <p class="{{ $ocorrencia->tipo != 'O' ? 'd-none' : '' }}">
                             <strong>Localização:</strong> <span class="text-muted">{{ $ocorrencia->localizacao }}</span>
                         </p>
