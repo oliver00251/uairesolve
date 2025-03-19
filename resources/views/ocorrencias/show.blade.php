@@ -12,7 +12,7 @@
                     <a href="{{ route('ocorrencias.index') }}" class="text-decoration-none text-dark">
                         <i class="fas fa-arrow-left fa-lg"></i>
                     </a>
-                    <h2 class="ms-2 mb-0 fs-5 fs-md-3">Detalhes da {{ $tituloOcorrencia }}</h2>
+                    <h2 class="ms-2 mb-0 fs-5 fs-md-3">Detalhes da {{$ocorrencia->categoria->nome ?? 'Outros'}}</h2>
                 </div>
 
                 {{-- Detalhes da ocorrência --}}
