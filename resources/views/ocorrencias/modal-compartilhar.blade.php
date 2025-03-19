@@ -156,7 +156,7 @@
             <div class="card-header" style="position: relative; flex-shrink: 0; height: 50%; overflow: hidden;">
                 <img src="{{ asset('storage/' . $ocorrencia->imagem) }}" alt="Ocorrência" style="width: 100%; height: 100%; object-fit: cover;">
                 <div class="title-banner" style="position: absolute; bottom: 30px; left: 20px; background: rgba(0, 0, 0, 0.7); color: white; padding: 12px 16px; font-weight: bold; border-radius: 10px; font-size: 2.6rem;  z-index: 1000">
-                    {{ $ocorrencia->titulo }}
+                     {{ $ocorrencia->categoria->nome }} : {{ $ocorrencia->titulo }}
                 </div>
             </div>
             <div class="card-body" style="padding: 40px; text-align: left; flex-grow: 1;  z-index: 1">
