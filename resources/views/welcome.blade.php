@@ -13,13 +13,11 @@
         <p class="lead mb-4">Registre problemas urbanos e acompanhe a solução em tempo real.</p>
         
         <!-- Botão de ação -->
-        <a href="{{ route('ocorrencias.index', ['filtro' => 'O']) }}" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary">
-            <i class="fas fa-map-marker-alt"></i> Visualizar Ocorrências
+        <a href="{{ route('ocorrencias.index') }}" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary">
+            <i class="fas fa-map-marker-alt"></i> Visualizar Publicações
         </a>
         
-        <a href="{{ route('ocorrencias.index', ['filtro' => 'S']) }}" class="btn btn-light btn-lg px-4 mt-3 rounded-pill text-primary">
-            <i class="fas fa-lightbulb"></i> Visualizar Sugestões
-        </a>
+       
         
         
         

@@ -40,12 +40,12 @@ class OcorrenciaController extends Controller
 
     public function create()
     {
-       
+
         $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Vagas de emprego'])
             ->orderBy('nome', 'asc')
             ->get();
 
-        return view('ocorrencias.create', compact( 'categorias')); // Passa o tipo para a view
+        return view('ocorrencias.create', compact('categorias')); // Passa o tipo para a view
     }
     public function store(Request $request)
     {
@@ -60,28 +60,28 @@ class OcorrenciaController extends Controller
             'imagem' => 'nullable|image|mimes:jpeg,png,gif|max:20480', // Limite de 20MB
             'link' => 'nullable', // Validar se o link é válido, se fornecido
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors()
             ]);
         }
-    
+
         // Criação de uma nova instância de Ocorrencia
         $ocorrencia = new Ocorrencia();
-    
+
         // Preenchendo os dados diretamente no modelo
         $ocorrencia->titulo = $request->input('titulo');
         $ocorrencia->descricao = $request->input('descricao');
         $ocorrencia->localizacao = $request->input('localizacao');
         $ocorrencia->user_id = auth()->id();
-    
+
         // Garantir que tipo e categoria_id sejam iguais (tipo é o nome da categoria)
         $categoria = Categoria::find($request->input('tipo'));
         $ocorrencia->tipo = $request->input('tipo'); // Usando o nome da categoria como tipo
         $ocorrencia->categoria_id = $request->input('tipo');
-    
+
         // Salvar o link, se houver
         if ($request->filled('link')) {
             $link = new Link(); // Assumindo que a tabela `links` tenha um modelo Link
@@ -89,10 +89,10 @@ class OcorrenciaController extends Controller
             $link->categoria_id = $categoria->id;
             $link->descricao = $categoria->descricao;
             $link->save();
-    
+
             $ocorrencia->link_id = $link->id; // Salvando o id_link na tabela ocorrencias
         }
-    
+
         // Processa a imagem, se houver
         if ($request->hasFile('imagem')) {
             try {
@@ -105,10 +105,10 @@ class OcorrenciaController extends Controller
                 ]);
             }
         }
-    
+
         // Salva a ocorrência no banco de dados
         $ocorrencia->save();
-    
+
         // Registra a localização se houver latitude e longitude
         if ($request->filled(['latitude', 'longitude'])) {
             OcorrenciaLog::create([
@@ -118,19 +118,22 @@ class OcorrenciaController extends Controller
                 'longitude' => $request->longitude
             ]);
         }
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Ocorrência registrada com sucesso!',
             'redirect' => route('ocorrencias.index')
         ]);
     }
-    
+
 
 
     public function show(Ocorrencia $ocorrencia)
     {
-        $ocorrencia->load('comentarios');
+        // Carregar os relacionamentos necessários (comentários e link)
+        $ocorrencia->load('comentarios', 'link');
+
+        // Definir o título baseado no tipo
         $tituloOcorrencia = [
             'O' => 'Ocorrência',
             'S' => 'Sugestão',
@@ -139,90 +142,116 @@ class OcorrenciaController extends Controller
             'outro' => 'Outro Tipo',
         ][$ocorrencia->tipo] ?? 'Outro Tipo';
 
+        // Contar os likes
         $totalLikes = $ocorrencia->likes()->count();
 
+        // Retornar a view com os dados necessários
         return view('ocorrencias.show', compact('ocorrencia', 'tituloOcorrencia', 'totalLikes'));
     }
+
 
     public function edit(Ocorrencia $ocorrencia)
     {
         $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Vagas de emprego'])
             ->orderBy('nome', 'asc')
             ->get();
-    
+
         // Chama o relacionamento 'link' para carregar o link associado à ocorrência
         $link = $ocorrencia->link;  // Acessando o relacionamento 'link'
-    
+
         if (!$this->hasPermission($ocorrencia)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Você não tem permissão para editar esta ocorrência.'
             ]);
         }
-    
+
         return view('ocorrencias.edit', compact('ocorrencia', 'categorias', 'link'));
     }
-    
+
 
     public function update(Request $request, Ocorrencia $ocorrencia)
-    {
-        // Verificação de permissão
-        if (!$this->hasPermission($ocorrencia)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Você não tem permissão para editar esta ocorrência.'
-            ]);
-        }
-    
-        // Validação de dados
-        $validator = Validator::make($request->all(), [
-            'titulo' => 'required|string|max:255',
-            'descricao' => 'required|string',
-            'localizacao' => 'nullable|string',  // Garantir que o campo localizacao seja válido
-            'status' => 'required|in:Aberta,Em andamento,Resolvida,Excluir',
-            'imagem' => 'nullable|image|mimes:jpeg,png,gif|max:20480', // Limite de 20MB
-        ]);
-    
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ]);
-        }
-    
-        // Preenchendo os dados diretamente no modelo
-        $ocorrencia->titulo = $request->input('titulo');
-        $ocorrencia->descricao = $request->input('descricao');
-        $ocorrencia->localizacao = $request->input('localizacao');  // Salva o valor da localização
-        $ocorrencia->status = $request->input('status') == 'Excluir' ? 'Arquivada' : $request->input('status');
-    
-        // Garantir que tipo e categoria_id sejam iguais
-        $categoria = Categoria::find($request->input('tipo'));
-        $ocorrencia->tipo = $request->input('tipo'); // Usando o nome da categoria como tipo
-        $ocorrencia->categoria_id = $request->input('tipo'); // Atualiza o ID da categoria
-    
-        // Processa a imagem, se houver
-        if ($request->hasFile('imagem')) {
-            try {
-                $ocorrencia->imagem = $this->imageService->processAndSave($request->file('imagem'));
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Erro ao processar a imagem: ' . $e->getMessage()
-                ]);
-            }
-        }
-    
-        // Salva a ocorrência atualizada no banco de dados
-        $ocorrencia->save();
-    
+{
+    // Verificação de permissão
+    if (!$this->hasPermission($ocorrencia)) {
         return response()->json([
-            'success' => true,
-            'message' => 'Ocorrência atualizada com sucesso!',
-            'redirect' => route('ocorrencias.index')
+            'success' => false,
+            'message' => 'Você não tem permissão para editar esta ocorrência.'
         ]);
     }
-    
+
+    // Validação de dados
+    $validator = Validator::make($request->all(), [
+        'titulo' => 'required|string|max:255',
+        'descricao' => 'required|string',
+        'localizacao' => 'nullable|string',
+        'status' => 'required|in:Aberta,Em andamento,Resolvida,Excluir',
+        'imagem' => 'nullable|image|mimes:jpeg,png,gif|max:20480', // Limite de 20MB
+        'link' => 'nullable', // Validar o link, se fornecido
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors()
+        ]);
+    }
+
+    // Preenchendo os dados diretamente no modelo
+    $ocorrencia->titulo = $request->input('titulo');
+    $ocorrencia->descricao = $request->input('descricao');
+    $ocorrencia->localizacao = $request->input('localizacao');
+    $ocorrencia->status = $request->input('status') == 'Excluir' ? 'Arquivada' : $request->input('status');
+
+    // Garantir que tipo e categoria_id sejam iguais
+    $categoria = Categoria::find($request->input('tipo'));
+    $ocorrencia->tipo = $request->input('tipo');
+    $ocorrencia->categoria_id = $request->input('tipo'); // Atualiza o ID da categoria
+
+    // Atualizar o link, se fornecido
+    if ($request->filled('link')) {
+        // Verifica se já existe um link associado
+        $link = Link::find($ocorrencia->link_id); 
+        if ($link) {
+            // Se o link existir, atualiza a URL
+            $link->url = $request->input('link');
+            $link->save();
+        } else {
+            // Se não existir, cria um novo link
+            $link = new Link();
+            $link->url = $request->input('link');
+            $link->categoria_id = $categoria->id;
+            $link->descricao = $categoria->descricao;
+            $link->save();
+
+            // Associa o link criado à ocorrência
+            $ocorrencia->link_id = $link->id;
+        }
+    }
+
+    // Processa a imagem, se houver
+    if ($request->hasFile('imagem')) {
+        try {
+            $ocorrencia->imagem = $this->imageService->processAndSave($request->file('imagem'));
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao processar a imagem: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    // Salva a ocorrência atualizada no banco de dados
+    $ocorrencia->save();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Ocorrência atualizada com sucesso!',
+        'redirect' => route('ocorrencias.index')
+    ]);
+}
+
+
 
 
 
