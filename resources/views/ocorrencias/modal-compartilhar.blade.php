@@ -21,7 +21,15 @@
         </div>
     </div>
 </div>
-
+@if($ocorrencia->categoria->nome == 'Ajuda')
+    <style>
+        .card-body {
+        background: #FFB60A;
+        color: rgb(27, 27, 27);
+        padding: 20px;
+    }
+    </style>
+@endif
 {{-- CSS para formatação no print --}}
 <style>
     .ocorrencia-img {
@@ -81,51 +89,6 @@
             padding: 5.7rem 0rem;
         }
     }
-    <style>
-        .card-custom {
-            width: 100%;
-            max-width: 400px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .card-header {
-            position: relative;
-        }
-        .card-header img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-        .title-banner {
-            position: absolute;
-            bottom: -10px;
-            left: 10px;
-            background: white;
-            color: #0056b3;
-            padding: 8px 12px;
-            font-weight: bold;
-            border-radius: 10px;
-            font-size: 1.1rem;
-        }
-        .card-body {
-            background: #0056b3;
-            color: white;
-            padding: 20px;
-        }
-        .divider {
-            height: 1px;
-            background: white;
-            margin: 20px 0;
-        }
-        .footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-    </style>
 </style>
 <script>
    document.getElementById('btnCompartilhar').addEventListener('click', function() {
