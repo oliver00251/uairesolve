@@ -9,11 +9,11 @@
             <div class="col-md-6 mb-3">
                 <div class="card shadow-sm">
                     <div class="card-header  ">
-                        <h5>{{$ocorrencia->tipo != 'O' ? 'Sugestão  ' : 'Ocorrência  '}}</h5>
+                        <h5>{{$ocorrencia->categoria->nome ?? 'Outros'}}</h5>
                     </div>
                     <div class="card-body">
                         <h5 class="card-title fw-bold">{{ $ocorrencia->titulo }}</h5>
-                        <p class="text-muted mb-1 {{ $ocorrencia->tipo != 'O' ? 'd-none' : '' }}"><i class="fas fa-map-marker-alt"></i> {{ $ocorrencia->localizacao }}</p>
+                        <p class="text-muted mb-1 "><i class="fas fa-map-marker-alt"></i> {{ $ocorrencia->localizacao ?? 'N/A' }}</p>
                         <p class="card-text">{{ Str::limit($ocorrencia->descricao, 100) }}</p>
                         <a href="{{ route('ocorrencias.show', $ocorrencia) }}" class="btn btn-primary btn-sm">Ver Detalhes</a>
                     </div>

@@ -1,9 +1,15 @@
-<h2 class="text-center mb-4">Registrar Nova Ocorrência</h2>
+<h2 class="text-center mb-4">Registrar Nova Publicação</h2>
 
 <form id="form-ocorrencia" enctype="multipart/form-data">
     @csrf
-    <input type="text" value="{{$registro}}" name="tipo" hidden>
-    
+    <select name="tipo" class="form-control" required>
+        @foreach($categorias as $categoria)
+            <option value="{{ $categoria->id }}" {{ old('tipo') == $categoria->id ? 'selected' : '' }}>
+                {{ $categoria->nome }}
+            </option>
+        @endforeach
+    </select>
+
     <div class="mb-3">
         <label for="titulo" class="form-label">Título</label>
         <input type="text" id="titulo" name="titulo" class="form-control" required>
@@ -14,9 +20,14 @@
         <textarea id="descricao" name="descricao" class="form-control" rows="3" required></textarea>
     </div>
 
+    <div class="mb-3" id="link-container" style="display: none;">
+        <label for="link" class="form-label">Link (opcional)</label>
+        <input type="text" id="link" name="link" class="form-control" placeholder="Digite o link">
+    </div>
+
     <div class="mb-3">
         <label for="localizacao" class="form-label">Localização</label>
-        <input type="text" id="localizacao" name="localizacao" class="form-control" required>
+        <input type="text" id="localizacao" name="localizacao" placeholder="Digite o nome da cidade ou endereço completo " class="form-control" required>
     </div>
 
     <div class="mb-3">
@@ -30,7 +41,7 @@
         Enviando, por favor aguarde...
     </div>
 
-    <button type="submit" id="submit-button" class="btn btn-primary">Registrar Ocorrência</button>
+    <button type="submit" id="submit-button" class="btn btn-primary">Registrar</button>
 </form>
 
 <style>
@@ -122,4 +133,22 @@
             statusMessage.style.display = 'none';
         });
     });
+
+    // Função para mostrar ou esconder o campo de link
+    function toggleLinkField() {
+        const categoriaSelect = document.querySelector('select[name="tipo"]');
+        const linkContainer = document.getElementById('link-container');
+        const selectedCategoria = categoriaSelect.options[categoriaSelect.selectedIndex].text; // Obtém o nome da categoria selecionada
+
+        // Se a categoria selecionada for 'Ajuda', 'Causa Animal' ou 'Eventos', mostrar o campo de link
+        if (['Ajuda', 'Causa Animal', 'Eventos', 'Vagas de emprego'].includes(selectedCategoria)) {
+            linkContainer.style.display = 'block';
+        } else {
+            linkContainer.style.display = 'none';
+        }
+    }
+
+    // Chama a função ao carregar a página e quando a categoria for alterada
+    document.addEventListener('DOMContentLoaded', toggleLinkField);
+    document.querySelector('select[name="tipo"]').addEventListener('change', toggleLinkField);
 </script>

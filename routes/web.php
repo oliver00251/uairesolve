@@ -30,7 +30,7 @@ Route::get('auth/callback/google', [AuthController::class, 'handleGoogleCallback
 # Ocorrencias
 Route::resource('ocorrencias', OcorrenciaController::class)->except(['show']);  // Excluímos a rota 'show' da resource para evitar conflito.
 Route::get('/ocorrencias/{filtro?}', [OcorrenciaController::class, 'index'])->name('ocorrencias.index');  // Listagem de ocorrências
-Route::get('/ocorrencias/show/{ocorrencia}', [OcorrenciaController::class, 'show'])->name('ocorrencias.show');  // Detalhes da ocorrência
+Route::get('/ocorrencias/show/{ocorrencia?}', [OcorrenciaController::class, 'show'])->name('ocorrencias.show');  // Detalhes da ocorrência
 Route::get('/ocorrencias/create/{tipo?}', [OcorrenciaController::class, 'create'])->name('ocorrencias.create');  // Criação de nova ocorrência
 
 Route::post('ocorrencias/{ocorrencia}/comentarios', [ComentarioController::class, 'store'])->name('comentarios.store');  // Rota para criação de comentários

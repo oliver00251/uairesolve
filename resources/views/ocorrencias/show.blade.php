@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+@dump($ocorrencia)
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-6 exibir_conteudo">
@@ -22,9 +23,19 @@
                         <p class="{{ $ocorrencia->tipo != 'O' ? 'd-none' : '' }}">
                             <strong>Localização:</strong> <span class="text-muted">{{ $ocorrencia->localizacao }}</span>
                         </p>
+                        
+                        {{-- Link (se existir) --}}
+                        @if($ocorrencia->link)
+                            <p>
+                                <strong>Link:</strong> 
+                                <a href="{{ $ocorrencia->link }}" target="_blank" class="text-muted">{{ $ocorrencia->link }}</a>
+                            </p>
+                        @endif
+
                         <p><strong>Publicado em:</strong> <span class="text-muted">
                                 {{ $ocorrencia->created_at ? $ocorrencia->created_at->format('d/m/Y H:i') : 'Data não disponível' }}
-                            </span></p>
+                            </span>
+                        </p>
                     </div>
 
                     {{-- Imagem da ocorrência --}}

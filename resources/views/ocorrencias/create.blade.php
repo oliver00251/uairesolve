@@ -3,16 +3,12 @@
 @section('content')
 @auth
 <div class="container mt-4">
-    @if($registro == 'O')
+   
         <div class="registro_new">
             @include('form.ocorrencia')
         </div>
-    @endif
-    @if($registro == 'S')
-        <div class="registro_new">
-            @include('form.sugestao')
-        </div>
-    @endif
+    
+    
 
     <style>
         /* Estilos gerais para a classe .registro_new */

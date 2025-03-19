@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="container-fluid">
+    @dump($ocorrencia)
     <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-6 exibir_conteudo">
             {{-- Card de Edição --}}
@@ -19,15 +21,28 @@
                     <form id="editOcorrenciaForm" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
-                        <label for="status" class="form-label">Ações</label>
 
+                        {{-- Status --}}
+                        <label for="status" class="form-label">Status</label>
                         <select name="status" id="status" class="form-select" required>
                             <option value="Aberta" {{ old('status', $ocorrencia->status) == 'Aberta' ? 'selected' : '' }}>Aberta</option>
                             <option value="Em andamento" {{ old('status', $ocorrencia->status) == 'Em andamento' ? 'selected' : '' }}>Em andamento</option>
                             <option value="Resolvida" {{ old('status', $ocorrencia->status) == 'Resolvida' ? 'selected' : '' }}>Resolvida</option>
                             <option value="Excluir" {{ old('status', $ocorrencia->status) == 'Excluir' ? 'selected' : '' }}>Excluir</option>
                         </select>
-                        
+
+                        {{-- Tipo --}}
+                        <div class="mb-3">
+                            <label for="tipo" class="form-label">Tipo</label>
+                            <select name="tipo" class="form-control" required>
+                                @foreach($categorias as $categoria)
+                                    <option value="{{ $categoria->id }}" {{ old('tipo', $ocorrencia->tipo) == $categoria->id ? 'selected' : '' }}>
+                                        {{ $categoria->nome }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         {{-- Título --}}
                         <div class="mb-3">
                             <label for="titulo" class="form-label">Título</label>
@@ -41,10 +56,20 @@
                         </div>
 
                         {{-- Localização (se aplicável) --}}
-                        @if($ocorrencia->tipo == 'O') 
+                       
                             <div class="mb-3">
                                 <label for="localizacao" class="form-label">Localização</label>
                                 <input type="text" name="localizacao" id="localizacao" class="form-control" value="{{ old('localizacao', $ocorrencia->localizacao) }}">
+                            </div>
+                        
+
+                        {{-- Exibindo a imagem atual (se houver) --}}
+                        @if ($ocorrencia->imagem)
+                            <div class="mb-3">
+                                <label class="form-label">Imagem atual</label>
+                                <div>
+                                    <img src="{{ asset('storage/' . $ocorrencia->imagem) }}" class="img-fluid" alt="Imagem da ocorrência">
+                                </div>
                             </div>
                         @endif
 
@@ -52,6 +77,12 @@
                         <div class="mb-3">
                             <label for="imagem" class="form-label">Imagem (opcional)</label>
                             <input type="file" name="imagem" id="imagem" class="form-control">
+                        </div>
+
+                        {{-- Link (se aplicável) --}}
+                        <div class="mb-3">
+                            <label for="link" class="form-label">Link (opcional)</label>
+                            <input type="text" name="link" id="link" class="form-control" value="{{ old('link', $ocorrencia->link ? $ocorrencia->link->url : '') }}">
                         </div>
 
                         {{-- Botão de Submissão --}}
@@ -66,13 +97,11 @@
 </div>
 
 <style>
-    /* Estilo para telas maiores */
     .exibir_conteudo {
         padding-top: 8rem;
         padding-bottom: 8rem;
     }
 
-    /* Estilo para telas pequenas (máximo de 767px) */
     @media (max-width: 767px) {
         .exibir_conteudo {
             padding-top: 6rem;
@@ -84,19 +113,18 @@
         }
 
         h2, h3 {
-            font-size: 1.25rem;  /* Ajuste o tamanho do título para telas pequenas */
+            font-size: 1.25rem;
         }
 
         .btn {
-            font-size: 0.875rem;  /* Reduz o tamanho do botão */
+            font-size: 0.875rem;
         }
 
         .mb-4 {
-            margin-bottom: 1.5rem;  /* Ajuste do espaçamento para telas menores */
+            margin-bottom: 1.5rem;
         }
     }
 
-    /* Ajuste das bordas e sombras do formulário */
     .card, .border {
         border-radius: 8px;
     }
