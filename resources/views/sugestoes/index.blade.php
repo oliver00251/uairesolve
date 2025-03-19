@@ -24,7 +24,7 @@
 
 <!-- Botão flutuante no mobile -->
 <a href="{{ route('ocorrencias.create') }}" class="btn btn-danger rounded-circle shadow-lg position-fixed"
-   style="bottom: 20px; right: 20px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
-    <i class="fas fa-plus fa-lg"></i>
+   style="bottom: 20px; right: 20px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;background:#0B5ED7 !important">
+    <i class="fas fa-plus fa-lg text-white"></i>
 </a>
 @endsection
