@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="container-fluid">
-    @dump($ocorrencia)
+
     <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-6 exibir_conteudo">
             {{-- Card de Edição --}}
