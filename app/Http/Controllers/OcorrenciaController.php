@@ -324,13 +324,15 @@ class OcorrenciaController extends Controller
 
         // Quebrar a descrição em linhas de até 40 caracteres
         $descricaoQuebrada = wordwrap($descricao, 35, "\n");
+        // Quebrar o titulo em linhas de até 3 caracteres
+        $titulo = wordwrap($titulo, 20, "\n");
 
         // Posicionar os textos na imagem
         imagettftext($imagem, 32, 0, 350, 140, $corAzul, $fonte, $categoria);
         imagettftext($imagem, 20, 0, 350, 170, $corAzul, $fonte, $titulo);
 
         // Desenhar a descrição quebrada
-        $posY = 220;
+        $posY = 240;
         foreach (explode("\n", $descricaoQuebrada) as $linha) {
             imagettftext($imagem, 20, 0, 350, $posY, $corPreto, $fonte, $linha);
             $posY += 30; // Ajuste para a próxima linha
