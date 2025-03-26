@@ -41,7 +41,7 @@ class OcorrenciaController extends Controller
     public function create()
     {
 
-        $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Vagas de emprego','Reclamação'])
+        $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Vagas de emprego', 'Reclamação'])
             ->orderBy('nome', 'asc')
             ->get();
 
@@ -152,7 +152,7 @@ class OcorrenciaController extends Controller
 
     public function edit(Ocorrencia $ocorrencia)
     {
-        $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Vagas de emprego','Reclamação'])
+        $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Vagas de emprego', 'Reclamação'])
             ->orderBy('nome', 'asc')
             ->get();
 
@@ -171,85 +171,85 @@ class OcorrenciaController extends Controller
 
 
     public function update(Request $request, Ocorrencia $ocorrencia)
-{
-    // Verificação de permissão
-    if (!$this->hasPermission($ocorrencia)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Você não tem permissão para editar esta ocorrência.'
-        ]);
-    }
-
-    // Validação de dados
-    $validator = Validator::make($request->all(), [
-        'titulo' => 'required|string|max:255',
-        'descricao' => 'required|string',
-        'localizacao' => 'nullable|string',
-        'status' => 'required|in:Aberta,Em andamento,Resolvida,Excluir',
-        'imagem' => 'nullable|image|mimes:jpeg,png,gif|max:20480', // Limite de 20MB
-        'link' => 'nullable', // Validar o link, se fornecido
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'success' => false,
-            'errors' => $validator->errors()
-        ]);
-    }
-
-    // Preenchendo os dados diretamente no modelo
-    $ocorrencia->titulo = $request->input('titulo');
-    $ocorrencia->descricao = $request->input('descricao');
-    $ocorrencia->localizacao = $request->input('localizacao');
-    $ocorrencia->status = $request->input('status') == 'Excluir' ? 'Arquivada' : $request->input('status');
-
-    // Garantir que tipo e categoria_id sejam iguais
-    $categoria = Categoria::find($request->input('tipo'));
-    $ocorrencia->tipo = $request->input('tipo');
-    $ocorrencia->categoria_id = $request->input('tipo'); // Atualiza o ID da categoria
-
-    // Atualizar o link, se fornecido
-    if ($request->filled('link')) {
-        // Verifica se já existe um link associado
-        $link = Link::find($ocorrencia->link_id); 
-        if ($link) {
-            // Se o link existir, atualiza a URL
-            $link->url = $request->input('link');
-            $link->save();
-        } else {
-            // Se não existir, cria um novo link
-            $link = new Link();
-            $link->url = $request->input('link');
-            $link->categoria_id = $categoria->id;
-            $link->descricao = $categoria->descricao;
-            $link->save();
-
-            // Associa o link criado à ocorrência
-            $ocorrencia->link_id = $link->id;
-        }
-    }
-
-    // Processa a imagem, se houver
-    if ($request->hasFile('imagem')) {
-        try {
-            $ocorrencia->imagem = $this->imageService->processAndSave($request->file('imagem'));
-        } catch (\Exception $e) {
+    {
+        // Verificação de permissão
+        if (!$this->hasPermission($ocorrencia)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao processar a imagem: ' . $e->getMessage()
+                'message' => 'Você não tem permissão para editar esta ocorrência.'
             ]);
         }
+
+        // Validação de dados
+        $validator = Validator::make($request->all(), [
+            'titulo' => 'required|string|max:255',
+            'descricao' => 'required|string',
+            'localizacao' => 'nullable|string',
+            'status' => 'required|in:Aberta,Em andamento,Resolvida,Excluir',
+            'imagem' => 'nullable|image|mimes:jpeg,png,gif|max:20480', // Limite de 20MB
+            'link' => 'nullable', // Validar o link, se fornecido
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
+
+        // Preenchendo os dados diretamente no modelo
+        $ocorrencia->titulo = $request->input('titulo');
+        $ocorrencia->descricao = $request->input('descricao');
+        $ocorrencia->localizacao = $request->input('localizacao');
+        $ocorrencia->status = $request->input('status') == 'Excluir' ? 'Arquivada' : $request->input('status');
+
+        // Garantir que tipo e categoria_id sejam iguais
+        $categoria = Categoria::find($request->input('tipo'));
+        $ocorrencia->tipo = $request->input('tipo');
+        $ocorrencia->categoria_id = $request->input('tipo'); // Atualiza o ID da categoria
+
+        // Atualizar o link, se fornecido
+        if ($request->filled('link')) {
+            // Verifica se já existe um link associado
+            $link = Link::find($ocorrencia->link_id);
+            if ($link) {
+                // Se o link existir, atualiza a URL
+                $link->url = $request->input('link');
+                $link->save();
+            } else {
+                // Se não existir, cria um novo link
+                $link = new Link();
+                $link->url = $request->input('link');
+                $link->categoria_id = $categoria->id;
+                $link->descricao = $categoria->descricao;
+                $link->save();
+
+                // Associa o link criado à ocorrência
+                $ocorrencia->link_id = $link->id;
+            }
+        }
+
+        // Processa a imagem, se houver
+        if ($request->hasFile('imagem')) {
+            try {
+                $ocorrencia->imagem = $this->imageService->processAndSave($request->file('imagem'));
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erro ao processar a imagem: ' . $e->getMessage()
+                ]);
+            }
+        }
+
+        // Salva a ocorrência atualizada no banco de dados
+        $ocorrencia->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ocorrência atualizada com sucesso!',
+            'redirect' => route('ocorrencias.index')
+        ]);
     }
-
-    // Salva a ocorrência atualizada no banco de dados
-    $ocorrencia->save();
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Ocorrência atualizada com sucesso!',
-        'redirect' => route('ocorrencias.index')
-    ]);
-}
 
 
 
@@ -278,4 +278,82 @@ class OcorrenciaController extends Controller
     {
         return $ocorrencia->user_id === auth()->id() || auth()->user()->is_admin;
     }
+
+    public function gerarImagem($id=1)
+    {
+        $ocorrencia = Ocorrencia::find($id);
+
+        if (!$ocorrencia) {
+            return response()->json(['error' => 'Ocorrência não encontrada!'], 404);
+        }
+
+        // Caminho da imagem base
+        $imagemBase = public_path('images/img_modelo.png');
+
+        if (!file_exists($imagemBase)) {
+            return response()->json(['error' => 'Imagem base não encontrada!'], 404);
+        }
+
+        $imagem = imagecreatefrompng($imagemBase);
+
+        // Definir cores do texto
+        $corAzul = imagecolorallocate($imagem, 0, 91, 187);
+        $corPreto = imagecolorallocate($imagem, 50, 50, 50);
+
+        // Definir a fonte
+        $fonte = public_path('fonts/ARIAL.TTF');
+
+        if (!file_exists($fonte)) {
+            return response()->json(['error' => 'Fonte não encontrada!'], 404);
+        }
+
+        // Textos dinâmicos
+        $categoria = mb_strtoupper($ocorrencia->categoria->nome ?? 'Outros', 'UTF-8');
+        $titulo = mb_strtoupper($ocorrencia->titulo, 'UTF-8');
+        $descricao = strip_tags($ocorrencia->descricao); // Remove HTML para evitar problemas
+        $dataPublicacao = "\nPublicado em: \n" . $ocorrencia->created_at->format('d/m/Y H:i');
+        $site = "Veja a publicação completa em:\n" . "uairesolve.com.br\n". $dataPublicacao;
+        
+        
+        
+        // Limitar descrição a no máximo 50 palavras
+        $palavras = explode(' ', $descricao);
+        if (count($palavras) > 29) {
+            $descricao = implode(' ', array_slice($palavras, 0, 29)) . '...';
+        }
+
+        // Quebrar a descrição em linhas de até 40 caracteres
+        $descricaoQuebrada = wordwrap($descricao, 25, "\n");
+
+        // Posicionar os textos na imagem
+        imagettftext($imagem, 32, 0, 350, 140, $corAzul, $fonte, $categoria);
+        imagettftext($imagem, 20, 0, 350, 170, $corAzul, $fonte, $titulo);
+
+        // Desenhar a descrição quebrada
+        $posY = 220;
+        foreach (explode("\n", $descricaoQuebrada) as $linha) {
+            imagettftext($imagem, 20, 0, 350, $posY, $corPreto, $fonte, $linha);
+            $posY += 30; // Ajuste para a próxima linha
+        }
+
+        // Adicionar site
+        imagettftext($imagem, 16, 0, 350, $posY + 10, $corPreto, $fonte, $site);
+
+        // Criar a pasta 'geradas' se não existir
+        $caminhoPasta = public_path('geradas');
+        if (!file_exists($caminhoPasta)) {
+            mkdir($caminhoPasta, 0777, true);
+        }
+
+        // Caminho para salvar a imagem final
+        $caminhoSaida = $caminhoPasta . '/imagem_final.png';
+        imagepng($imagem, $caminhoSaida);
+        imagedestroy($imagem);
+
+        // Retornar a URL da imagem gerada
+        return response()->download($caminhoSaida, 'ocorrencia_'.$id.'.png');
+
+    }
+
+
 }

@@ -32,6 +32,10 @@ Route::resource('ocorrencias', OcorrenciaController::class)->except(['show']);  
 Route::get('/ocorrencias/{filtro?}', [OcorrenciaController::class, 'index'])->name('ocorrencias.index');  // Listagem de ocorrências
 Route::get('/ocorrencias/show/{ocorrencia?}', [OcorrenciaController::class, 'show'])->name('ocorrencias.show');  // Detalhes da ocorrência
 Route::get('/ocorrencias/create/{tipo?}', [OcorrenciaController::class, 'create'])->name('ocorrencias.create');  // Criação de nova ocorrência
+Route::get('/ocorrencias/image/{id}', [OcorrenciaController::class, 'gerarImagem'])
+    ->where('id', '[0-9]+') // Garante que o ID seja um número
+    ->name('ocorrencias.gera.image');
+ 
 
 Route::post('ocorrencias/{ocorrencia}/comentarios', [ComentarioController::class, 'store'])->name('comentarios.store');  // Rota para criação de comentários
 Route::post('ocorrencias/{ocorrencia}/like', [OcorrenciaLikeController::class, 'store'])->name('ocorrencias.like');
