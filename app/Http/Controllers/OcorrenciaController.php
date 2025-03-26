@@ -329,7 +329,7 @@ class OcorrenciaController extends Controller
 
         // Posicionar os textos na imagem
         imagettftext($imagem, 32, 0, 350, 140, $corAzul, $fonte, $categoria);
-        imagettftext($imagem, 20, 0, 350, 170, $corAzul, $fonte, $titulo);
+        imagettftext($imagem, 18, 0, 350, 170, $corAzul, $fonte, $titulo);
 
         // Desenhar a descrição quebrada
         $posY = 240;
