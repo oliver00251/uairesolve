@@ -311,7 +311,7 @@ class OcorrenciaController extends Controller
         $categoria = mb_strtoupper($ocorrencia->categoria->nome ?? 'Outros', 'UTF-8');
         $titulo = mb_strtoupper($ocorrencia->titulo, 'UTF-8');
         $descricao = strip_tags($ocorrencia->descricao); // Remove HTML para evitar problemas
-        $dataPublicacao = "\nPublicado em: \n" . $ocorrencia->created_at->format('d/m/Y H:i');
+        $dataPublicacao = "\nPublicado em: \n" . $ocorrencia->created_at->format('d/m/Y');
         $site = "Veja a publicação completa em:\n" . "uairesolve.com.br\n". $dataPublicacao;
         
         
