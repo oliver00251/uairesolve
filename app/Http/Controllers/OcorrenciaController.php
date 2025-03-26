@@ -319,7 +319,7 @@ class OcorrenciaController extends Controller
         // Limitar descrição a no máximo 50 palavras
         $palavras = explode(' ', $descricao);
         if (count($palavras) > 29) {
-            $descricao = implode(' ', array_slice($palavras, 0, 38)) . '...';
+            $descricao = implode(' ', array_slice($palavras, 0, 45)) . '...';
         }
 
         // Quebrar a descrição em linhas de até 40 caracteres
