@@ -19,25 +19,26 @@ class OcorrenciaController extends Controller
         $this->imageService = $imageService;
     }
 
-    public function index($filtro = null)
+    public function index(Request $request)
     {
-        $tiposValidos = ['O', 'S', 'I', 'D']; // Ocorrência, Sugestão, Indicação, Denúncia
-
-        if ($filtro && !in_array($filtro, $tiposValidos)) {
-            abort(404, 'Filtro de tipo inválido');
-        }
-
+        // Pega o filtro da query string (exemplo: ?categoria=2)
+        $filtro = $request->query('categoria');
+    
         $ocorrencias = Ocorrencia::where('status', 'Aberta')
             ->when($filtro, function ($query) use ($filtro) {
-                return $query->where('tipo', $filtro);
+                return $query->where('categoria_id', $filtro);
             })
             ->with('categoria')
             ->latest()
             ->get();
-
-        return view('ocorrencias.index', compact('ocorrencias', 'filtro'));
+    
+        $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Vagas de emprego', 'Reclamação'])
+            ->orderBy('nome', 'asc')
+            ->get();
+    
+        return view('ocorrencias.index', compact('ocorrencias', 'filtro', 'categorias'));
     }
-
+    
     public function create()
     {
 
