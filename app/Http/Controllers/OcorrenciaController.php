@@ -323,7 +323,7 @@ class OcorrenciaController extends Controller
         }
 
         // Quebrar a descrição em linhas de até 40 caracteres
-        $descricaoQuebrada = wordwrap($descricao, 25, "\n");
+        $descricaoQuebrada = wordwrap($descricao, 35, "\n");
 
         // Posicionar os textos na imagem
         imagettftext($imagem, 32, 0, 350, 140, $corAzul, $fonte, $categoria);
