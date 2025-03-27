@@ -41,6 +41,7 @@
 }
 
 .blue_theme {
-    background: #0D6EFD;
+    background: #0D6EFD !important;
 }
+
 </style>
