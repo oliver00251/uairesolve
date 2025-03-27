@@ -19,7 +19,7 @@
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
                                     <small class="">{{ $ocorrencia->categoria->nome ?? 'Outros' }}</small>
-                                    <small class="text-muted ms-auto">{{ $ocorrencia->created_at->format('d/m/Y H:i') }}</small>
+                                    <small class="text-muted ms-auto">{{ $ocorrencia->created_at->diffForHumans() }}</small>
                                 </div>
                                 <h5 class="mt-2 card-title fw-bold">{{ $ocorrencia->titulo }}</h5>
                                 <p class="text-muted mb-1">
