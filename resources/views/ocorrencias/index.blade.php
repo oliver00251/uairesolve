@@ -18,7 +18,7 @@
                         <div class="card ocorrencia-card">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
-                                    <span class="categoria-badge bg-success">{{ $ocorrencia->categoria->nome ?? 'Outros' }}</span>
+                                    <small class="">{{ $ocorrencia->categoria->nome ?? 'Outros' }}</small>
                                     <small class="text-muted ms-auto">{{ $ocorrencia->created_at->format('d/m/Y H:i') }}</small>
                                 </div>
                                 <h5 class="mt-2 card-title fw-bold">{{ $ocorrencia->titulo }}</h5>
@@ -27,7 +27,7 @@
                                 </p>
                                 <p class="card-text">{{ Str::limit($ocorrencia->descricao, 80) }}</p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <a href="{{ route('ocorrencias.show', $ocorrencia) }}" class="btn btn-primary btn-sm">Ver Detalhes</a>
+                                    <a href="{{ route('ocorrencias.show', $ocorrencia) }}" class="btn btn-success btn-sm">Ver Detalhes</a>
                                 </div>
                             </div>
                         </div>
