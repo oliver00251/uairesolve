@@ -23,8 +23,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Redireciona para o Google
 Route::get('auth/redirect/google', [AuthController::class, 'redirectToGoogle']);
+
+// Recebe o callback do Google
 Route::get('auth/callback/google', [AuthController::class, 'handleGoogleCallback']);
+
 
 
 # Ocorrencias

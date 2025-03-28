@@ -14,39 +14,42 @@ class AuthController extends Controller
 {
 
 
+    // Método para redirecionar o usuário para o Google
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
     }
 
+    // Método para receber o callback do Google e autenticar o usuário
     public function handleGoogleCallback()
     {
         try {
+            // Obtém os dados do usuário retornado pelo Google
             $googleUser = Socialite::driver('google')->user();
 
-            // Verifica se o usuário já existe no banco de dados
-            $existingUser = User::where('email', $googleUser->getEmail())->first();
+            // Verifica se o usuário já existe na base de dados
+            $user = User::where('provider', 'google')
+                ->where('provider_id', $googleUser->getId())
+                ->first();
 
-            if ($existingUser) {
-                // Se o usuário existe, loga ele
-                auth()->login($existingUser, true);
-            } else {
-                // Cria um novo usuário
-                $newUser = User::create([
+            // Se o usuário não existe, cria um novo usuário
+            if (!$user) {
+                $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
-                    'google_id' => $googleUser->getId(),
-                    // Outros campos conforme necessário
+                    'provider' => 'google',
+                    'provider_id' => $googleUser->getId(),
                 ]);
-
-                // Loga o novo usuário
-                auth()->login($newUser, true);
             }
 
-            return redirect('/dashboard');  // Redireciona para o dashboard após o login
+            // Faz o login do usuário
+            Auth::login($user, true);
 
+            // Redireciona para a página inicial ou qualquer outra
+            return redirect()->route('home');
         } catch (\Exception $e) {
-            return redirect('/login')->with('error', 'Erro ao tentar fazer login com o Google.');
+            // Caso ocorra algum erro, redireciona com uma mensagem de erro
+            return redirect('/')->with('error', 'Erro ao tentar fazer login com o Google.');
         }
     }
     /**
@@ -122,51 +125,48 @@ class AuthController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        
+
         // Verifica se o usuário é admin
         $isAdmin = $user->tipo === 'admin';
-    
+
         // Ocorrências para o usuário
         $minhasOcorrencias = Ocorrencia::where('user_id', $user->id)
-                                        ->latest()
-                                        ->whereIn('status', ['Aberta', 'Em andamento', 'Resolvida'])
-                                        ->get();
-    
+            ->latest()
+            ->whereIn('status', ['Aberta', 'Em andamento', 'Resolvida'])
+            ->get();
+
         // Ocorrências onde o usuário comentou
         $ocorrenciasComentadas = Ocorrencia::whereHas('comentarios', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })->latest()->get();
-    
+
         // Para o administrador
         $ocorrencias = $isAdmin ? Ocorrencia::latest()->get() : collect(); // Lista todas as ocorrências para o admin
-        
+
         // Métricas para o administrador
         $totalOcorrencias = null;
         $ocorrenciasAbertas = null;
         $ocorrenciasResolvidas = null;
         $ocorrenciasEmAndamento = null;
-    
+
         if ($isAdmin) {
             $totalOcorrencias = Ocorrencia::count(); // Total de ocorrências
             $ocorrenciasAbertas = Ocorrencia::where('status', 'Aberta')->count(); // Ocorrências abertas
             $ocorrenciasResolvidas = Ocorrencia::where('status', 'Resolvida')->count(); // Ocorrências resolvidas
             $ocorrenciasEmAndamento = Ocorrencia::where('status', 'Em andamento')->count(); // Ocorrências em andamento
         }
-    
+
         // Passa as variáveis para a view
         return view('auth.dashboard', compact(
-            'user', 
-            'minhasOcorrencias', 
+            'user',
+            'minhasOcorrencias',
             'ocorrenciasComentadas',
             'ocorrencias',
-            'totalOcorrencias', 
-            'ocorrenciasAbertas', 
+            'totalOcorrencias',
+            'ocorrenciasAbertas',
             'ocorrenciasResolvidas',
             'ocorrenciasEmAndamento',
             'isAdmin' // Passa se é admin ou não
         ));
     }
-    
-    
-    
 }
