@@ -13,45 +13,44 @@ use Laravel\Socialite\Facades\Socialite;
 class AuthController extends Controller
 {
 
+  // Método para redirecionar para o Google
+  public function redirectToGoogle()
+  {
+      return Socialite::driver('google')->redirect();
+  }
 
-    // Método para redirecionar o usuário para o Google
-    public function redirectToGoogle()
-    {
-        return Socialite::driver('google')->redirect();
-    }
+  // Método para receber o callback do Google e autenticar o usuário
+  public function handleGoogleCallback()
+  {
+      try {
+          // Obtém os dados do usuário retornado pelo Google
+          $googleUser = Socialite::driver('google')->user();
 
-    // Método para receber o callback do Google e autenticar o usuário
-    public function handleGoogleCallback()
-    {
-        try {
-            // Obtém os dados do usuário retornado pelo Google
-            $googleUser = Socialite::driver('google')->user();
+          // Verifica se o usuário já existe na base de dados
+          $user = User::where('provider', 'google')
+                      ->where('provider_id', $googleUser->getId())
+                      ->first();
 
-            // Verifica se o usuário já existe na base de dados
-            $user = User::where('provider', 'google')
-                ->where('provider_id', $googleUser->getId())
-                ->first();
+          // Se o usuário não existe, cria um novo usuário
+          if (!$user) {
+              $user = User::create([
+                  'name' => $googleUser->getName(),
+                  'email' => $googleUser->getEmail(),
+                  'provider' => 'google',
+                  'provider_id' => $googleUser->getId(),
+              ]);
+          }
 
-            // Se o usuário não existe, cria um novo usuário
-            if (!$user) {
-                $user = User::create([
-                    'name' => $googleUser->getName(),
-                    'email' => $googleUser->getEmail(),
-                    'provider' => 'google',
-                    'provider_id' => $googleUser->getId(),
-                ]);
-            }
+          // Autentica o usuário
+          Auth::login($user, true);
 
-            // Faz o login do usuário
-            Auth::login($user, true);
-
-            // Redireciona para a página inicial ou qualquer outra
-            return redirect()->route('home');
-        } catch (\Exception $e) {
-            // Caso ocorra algum erro, redireciona com uma mensagem de erro
-            return redirect('/')->with('error', 'Erro ao tentar fazer login com o Google.');
-        }
-    }
+          // Redireciona para a página inicial ou qualquer outra
+          return redirect()->route('home'); // Aqui, você pode definir a rota que o usuário será redirecionado após o login.
+      } catch (\Exception $e) {
+          // Caso ocorra algum erro, redireciona com uma mensagem de erro
+          return redirect('/')->with('error', 'Erro ao tentar fazer login com o Google.');
+      }
+  }
     /**
      * Exibir a tela de login.
      */
