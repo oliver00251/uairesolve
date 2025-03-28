@@ -35,7 +35,6 @@
             </div>
             <button type="submit" class="btn btn-primary w-100">Entrar</button>
         </form>
-        <a href="{{ url('auth/redirect/google') }}" class="btn btn-primary">Login com Google</a>
         <div class="mt-3 text-center">
             <p>Não tem uma conta? <a href="{{ route('register') }}">Registre-se</a></p>
         </div>
