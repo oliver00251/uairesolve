@@ -25,6 +25,7 @@ class AuthController extends Controller
       try {
           // Obtém os dados do usuário retornado pelo Google
           $googleUser = Socialite::driver('google')->user();
+          dd($googleUser);
 
           // Verifica se o usuário já existe na base de dados
           $user = User::where('provider', 'google')
