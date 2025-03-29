@@ -50,5 +50,10 @@ class User extends Authenticatable
 {
     return $this->belongsToMany(Ocorrencia::class, 'ocorrencia_likes')->withTimestamps();
 }
+public function parceiro()
+{
+    return $this->hasOne(Parceiro::class);
+}
+
 
 }

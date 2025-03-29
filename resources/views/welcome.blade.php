@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid d-flex align-items-center justify-content-center vh-100 text-center" 
-     style="background: linear-gradient(180deg, #0052D4, #4364F7, #6FB1FC); color: #fff;">
+     style="background: linear-gradient(180deg, #0052D4, #4364F7, #6FB1FC); color: #fff; margin-top:-10vh;">
     <div>
         <div class="d-flex justify-content-center">
             <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
@@ -16,10 +16,6 @@
         <a href="{{ route('ocorrencias.index') }}" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary">
             <i class="fas fa-map-marker-alt"></i> Visualizar Publicações
         </a>
-        
-       
-        
-        
         
     </div>
 </div>

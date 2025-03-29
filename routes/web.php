@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\OcorrenciaController;
 use App\Http\Controllers\OcorrenciaLikeController;
+use App\Http\Controllers\ParceiroController;
+use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -57,3 +59,19 @@ Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('regi
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::resource('parceiros', ParceiroController::class);
+
+// Rota para criar postagem
+Route::get('parceiro/{parceiro}/post/create', [PostController::class, 'create'])->name('posts.create');
+
+// Rota para armazenar postagem
+Route::post('parceiro/{parceiro}/post', [PostController::class, 'store'])->name('posts.store');
+
+Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+
+Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+
+

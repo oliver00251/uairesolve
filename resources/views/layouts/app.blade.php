@@ -42,8 +42,9 @@
 </head>
 
 <body>
-    <div class="">
-      @include('layouts.nav')
+    @include('layouts.nav')
+    <div style="margin-top:10vh !important">
+    
         
         @yield('content') <!-- Aqui vai o conteúdo das páginas -->
         <style>
