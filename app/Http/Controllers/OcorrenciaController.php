@@ -80,7 +80,7 @@ class OcorrenciaController extends Controller
 
         // Garantir que tipo e categoria_id sejam iguais (tipo é o nome da categoria)
         $categoria = Categoria::find($request->input('tipo'));
-        $ocorrencia->tipo = $request->input('tipo'); // Usando o nome da categoria como tipo
+        $ocorrencia->tipo = 0; // Usando o nome da categoria como tipo
         $ocorrencia->categoria_id = $request->input('tipo');
 
         // Salvar o link, se houver
@@ -311,7 +311,8 @@ class OcorrenciaController extends Controller
         // Textos dinâmicos
         $categoria = mb_strtoupper($ocorrencia->categoria->nome ?? 'Outros', 'UTF-8');
         $titulo = mb_strtoupper($ocorrencia->titulo, 'UTF-8');
-        $descricao = strip_tags($ocorrencia->descricao); // Remove HTML para evitar problemas
+        $descricao = strip_tags($ocorrencia->descricao);
+        $descricao = preg_replace('/[^\p{L}\p{N}\p{P}\p{Z}]/u', '', $descricao); // Remove emojis e caracteres não suportados        
         $dataPublicacao = "\nPublicado em: \n" . $ocorrencia->created_at->format('d/m/Y');
         $site = "Veja a publicação completa em:\n" . "uairesolve.com.br\n". $dataPublicacao;
         
@@ -326,11 +327,11 @@ class OcorrenciaController extends Controller
         // Quebrar a descrição em linhas de até 40 caracteres
         $descricaoQuebrada = wordwrap($descricao, 35, "\n");
         // Quebrar o titulo em linhas de até 3 caracteres
-        $titulo = wordwrap($titulo, 20, "\n");
+        $titulo = wordwrap($titulo, 30, "\n");
 
         // Posicionar os textos na imagem
         imagettftext($imagem, 32, 0, 350, 140, $corAzul, $fonte, $categoria);
-        imagettftext($imagem, 19, 0, 350, 170, $corAzul, $fonte, $titulo);
+        imagettftext($imagem, 17, 0, 350, 170, $corAzul, $fonte, $titulo);
 
         // Desenhar a descrição quebrada
         $posY = 240;
