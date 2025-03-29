@@ -10,7 +10,6 @@
             <a href="{{ route('parceiros.create') }}" class="btn btn-primary">+ Novo Parceiro</a>
         @endif
     </div>
-    
 
     <div class="row">
         @foreach($parceiros as $parceiro)

@@ -94,7 +94,7 @@
     }
 
     .exibir_conteudo {
-        padding: 5.7rem 0.3rem;
+        padding: 0.7rem 0.3rem;
     }
 
     .card-header img {
