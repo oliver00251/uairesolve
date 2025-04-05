@@ -32,7 +32,7 @@ class OcorrenciaController extends Controller
             ->latest()
             ->get();
     
-        $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Vagas de emprego', 'Reclamação'])
+        $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Reclamação'])
             ->orderBy('nome', 'asc')
             ->get();
     
@@ -42,7 +42,7 @@ class OcorrenciaController extends Controller
     public function create()
     {
 
-        $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Vagas de emprego', 'Reclamação'])
+        $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Reclamação'])
             ->orderBy('nome', 'asc')
             ->get();
 
