@@ -37,10 +37,7 @@
     </div>
 </div>
 
-<!-- Botão flutuante no mobile -->
-<a href="{{ route('vagas.create') }}" class="btn btn-add-vaga">
-    <i class="fas fa-plus fa-lg text-white"></i>
-</a>
+
 
 @endsection
 
