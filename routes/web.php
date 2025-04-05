@@ -6,6 +6,7 @@ use App\Http\Controllers\OcorrenciaController;
 use App\Http\Controllers\OcorrenciaLikeController;
 use App\Http\Controllers\ParceiroController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\VagaEmpregoController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -73,5 +74,9 @@ Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.
 Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
 
 Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
+
+
+Route::resource('vagas', VagaEmpregoController::class);
+
 
 
