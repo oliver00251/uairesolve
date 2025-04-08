@@ -19,7 +19,7 @@
                                 <h5 class="mt-2 card-title fw-bold">✅{{ preg_replace('/^\d+\s-\s/', '', $vaga->titulo) }}
                                 </h5>
                                 <p class="text-muted mb-1">
-                                    <i class="fas fa-map-marker-alt"></i> {{ $vaga->localizacao ?? 'N/A' }}
+                                    <i class="fas fa-map-marker-alt"></i> {{ strtoupper($vaga->localizacao ?? 'N/A') }}
                                 </p>
                                 <p class="card-text">{{ Str::limit($vaga->descricao, 80) }}</p>
                                 <div class="d-flex justify-content-between align-items-center">
