@@ -11,11 +11,10 @@ class VagaEmpregoController extends Controller
      * Exibir uma lista das vagas de emprego.
      */
     public function index()
-{
-    $vagas = VagaEmprego::orderBy('created_at', 'desc')->get(); // Ordena as vagas mais recentes primeiro
-
-    return view('vagas.index', compact('vagas'));
-}
+    {
+        $vagas = VagaEmprego::orderBy('created_at', 'desc')->get();
+        return view('vagas.index', compact('vagas'));
+    }
 
     /**
      * Exibir o formulário para criar uma nova vaga de emprego.
@@ -59,14 +58,14 @@ class VagaEmpregoController extends Controller
      * Exibir os detalhes de uma vaga de emprego específica.
      */
     public function show($id)
-{
-    // Busca a vaga pelo ID
-    $vaga = VagaEmprego::findOrFail($id);
-   
+    {
+        // Busca a vaga pelo ID
+        $vaga = VagaEmprego::findOrFail($id);
 
-    // Retorna a view de detalhes, passando a vaga
-    return view('vagas.show', compact('vaga'));
-}
+
+        // Retorna a view de detalhes, passando a vaga
+        return view('vagas.show', compact('vaga'));
+    }
 
 
     /**
