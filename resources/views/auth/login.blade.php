@@ -1,8 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow p-4" style="width: 400px;">
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow p-4 card_login" >
+        <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+        <div class="d-flex justify-content-center">
+            <dotlottie-player src="https://lottie.host/f8f5fd6c-a605-4dc4-87e1-6b1262710549/YHfstIxz3Z.lottie" background="transparent" speed="0.5" style="width: 300px; height: 300px" loop autoplay></dotlottie-player>
+
+        </div>
         <h2 class="text-center mb-4">Login</h2>
 
         <!-- Exibição de erros -->
@@ -42,3 +47,11 @@
     </div>
 </div>
 @endsection
+<style>
+    .card_login{
+    width: 400px;
+    min-height: 100vh !important;
+    display: flex !important;
+    justify-content: center !important;
+    }
+</style>
