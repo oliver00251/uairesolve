@@ -23,7 +23,7 @@
                 </a>
 
                 <!-- Botão de Ocorrência com Dropdown (ao lado do Perfil) -->
-                <div class="dropdown me-3">
+               {{--  <div class="dropdown me-3">
                     <button class="btn btn-primary dropdown-toggle" type="button" id="ocorrenciaDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-clipboard-list"></i> Ocorrência
                     </button>
@@ -43,7 +43,7 @@
                         </li>
                     </ul>
                     
-                </div>
+                </div> --}}
 
                 <!-- Perfil do Usuário -->
                 <div class="dropdown">
@@ -53,8 +53,8 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                         <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-user"></i> Meu Perfil</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Configurações</a></li>
-                        <li><hr class="dropdown-divider"></li>
+{{--                         <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Configurações</a></li>
+ --}}                        <li><hr class="dropdown-divider"></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf

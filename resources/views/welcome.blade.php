@@ -14,13 +14,17 @@
         
         <!-- Botão de ação para Ocorrências -->
         <a href="{{ route('ocorrencias.index') }}" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary">
-            <i class="fas fa-map-marker-alt"></i> Visualizar Publicações
+            <i class="fas fa-map-marker-alt"></i> Ocorrências
         </a>
 
         <!-- Botão de ação para Vagas de Emprego -->
         <a href="{{ route('vagas.index') }}" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary">
             <i class="fas fa-briefcase"></i> Vagas de Emprego
         </a>
+        <!-- Botão de ação fale conosco -->
+        <a href="https://www.instagram.com/uairesolveoficial/" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary" target="_blank">
+            <i class="fab fa-instagram"></i> Fale Conosco
+        </a>        
     </div>
 </div>
 @endsection

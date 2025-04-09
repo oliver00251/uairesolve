@@ -9,37 +9,46 @@ class Ocorrencia extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['titulo', 'descricao', 'tipo', 'localizacao', 'user_id', 'categoria_id', 'status', 'imagem', 'link_id'];
+    protected $fillable = [
+        'titulo',
+        'descricao',
+        'tipo',
+        'localizacao',
+        'user_id',
+        'categoria_id',
+        'status',
+        'imagem',
+        'link_id',
+        'cidade_id',
+        'bairro_id'
+    ];
 
-    // Relacionamento com Comentários
+    // Comentários com relacionamento ao usuário
     public function comentarios()
     {
         return $this->hasMany(Comentario::class)->with('usuario');
     }
-    // Relacionamento com Comentários
+
     public function categoria()
     {
         return $this->belongsTo(Categoria::class, 'categoria_id');
     }
-    // Relacionamento com Likes
+
     public function likes()
     {
         return $this->hasMany(OcorrenciaLike::class);
     }
 
-    // Verifica se a Ocorrencia foi curtida pelo usuário
     public function isLikedByUser($userId)
     {
         return $this->likes()->where('user_id', $userId)->exists();
     }
 
-    // Relacionamento com o Usuário
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relacionamento com o Link
     public function link()
     {
         return $this->belongsTo(Link::class, 'link_id');
@@ -54,7 +63,6 @@ class Ocorrencia extends Model
     {
         return $this->hasOne(OcorrenciaStatusLog::class)->latestOfMany();
     }
-
 
     public function logStatusChange($novoStatus, $comentario = null, $alteradoPor = null)
     {
@@ -73,5 +81,15 @@ class Ocorrencia extends Model
             'comentario'      => $comentario,
             'alterado_por'    => $alteradoPor,
         ]);
+    }
+
+    public function bairro()
+    {
+        return $this->belongsTo(Bairro::class);
+    }
+
+    public function cidade()
+    {
+        return $this->belongsTo(Cidade::class);
     }
 }

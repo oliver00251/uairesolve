@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CidadeController;
 use App\Http\Controllers\VagaEmpregoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -20,4 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/vagas', [VagaEmpregoController::class, 'store']);
+Route::get('/cidades/{cidade}/bairros', [CidadeController::class, 'bairros']);
 

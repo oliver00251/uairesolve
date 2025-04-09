@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
+use App\Models\Cidade;
 use App\Models\Link;
 use App\Models\Ocorrencia;
 use App\Models\OcorrenciaLog;
@@ -35,7 +36,7 @@ class OcorrenciaController extends Controller
             ->latest()
             ->get();
 
-        $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Reclamação'])
+        $categorias = Categoria::whereIn('nome', ['Ajuda', 'Sugestão', 'Denúncias', 'Reclamação'])
             ->orderBy('nome', 'asc')
             ->get();
 
@@ -49,22 +50,21 @@ class OcorrenciaController extends Controller
             'status' => $status,
             'filtro' => $categoriaId // pra não quebrar o que já tá usando $filtro na view
         ]);
-        
     }
 
 
     public function create()
     {
-
-        $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Reclamação'])
+        $categorias = Categoria::whereIn('nome', ['Ajuda','Sugestão','Denúncias', 'Reclamação'])
             ->orderBy('nome', 'asc')
             ->get();
+        $cidades = Cidade::get();
 
-        return view('ocorrencias.create', compact('categorias')); // Passa o tipo para a view
+        return view('ocorrencias.create', compact('categorias', 'cidades')); // Passa o tipo para a view
     }
     public function store(Request $request)
     {
-        $test = $request->all();
+       $teste = $request->all();
         // Validação de dados
         $validator = Validator::make($request->all(), [
             'titulo' => 'required|string|max:255',
@@ -72,8 +72,11 @@ class OcorrenciaController extends Controller
             'localizacao' => 'nullable|string',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
-            'imagem' => 'nullable|image|mimes:jpeg,png,gif|max:20480', // Limite de 20MB
-            'link' => 'nullable', // Validar se o link é válido, se fornecido
+            'imagem' => 'nullable|image|mimes:jpeg,png,gif|max:20480', // 20MB
+            'link' => 'nullable|url|max:255',
+            'categoria_id' => 'required|exists:categorias,id',
+            'cidade_id' => 'required|exists:cidades,id',
+           
         ]);
 
         if ($validator->fails()) {
@@ -83,35 +86,34 @@ class OcorrenciaController extends Controller
             ]);
         }
 
-        // Criação de uma nova instância de Ocorrencia
-        $ocorrencia = new Ocorrencia();
+        // Busca a categoria
+        $categoria = Categoria::find($request->input('categoria_id'));
 
-        // Preenchendo os dados diretamente no modelo
+        // Cria a ocorrência
+        $ocorrencia = new Ocorrencia();
         $ocorrencia->titulo = $request->input('titulo');
         $ocorrencia->descricao = $request->input('descricao');
         $ocorrencia->localizacao = $request->input('localizacao');
         $ocorrencia->user_id = auth()->id();
+        $ocorrencia->categoria_id = $categoria->id;
+        $ocorrencia->tipo = 1;
+        $ocorrencia->cidade_id = $request->input('cidade_id');
+        $ocorrencia->bairro_id = 1;
 
-        // Garantir que tipo e categoria_id sejam iguais (tipo é o nome da categoria)
-        $categoria = Categoria::find($request->input('tipo'));
-        $ocorrencia->tipo = 0; // Usando o nome da categoria como tipo
-        $ocorrencia->categoria_id = $request->input('tipo');
-
-        // Salvar o link, se houver
+        // Se houver link
         if ($request->filled('link')) {
-            $link = new Link(); // Assumindo que a tabela `links` tenha um modelo Link
+            $link = new Link();
             $link->url = $request->input('link');
             $link->categoria_id = $categoria->id;
             $link->descricao = $categoria->descricao;
             $link->save();
 
-            $ocorrencia->link_id = $link->id; // Salvando o id_link na tabela ocorrencias
+            $ocorrencia->link_id = $link->id;
         }
 
         // Processa a imagem, se houver
         if ($request->hasFile('imagem')) {
             try {
-                // Processa e salva a imagem
                 $ocorrencia->imagem = $this->imageService->processAndSave($request->file('imagem'));
             } catch (\Exception $e) {
                 return response()->json([
@@ -121,10 +123,10 @@ class OcorrenciaController extends Controller
             }
         }
 
-        // Salva a ocorrência no banco de dados
+        // Salva a ocorrência
         $ocorrencia->save();
 
-        // Registra a localização se houver latitude e longitude
+        // Registra localização, se enviada
         if ($request->filled(['latitude', 'longitude'])) {
             OcorrenciaLog::create([
                 'user_id' => auth()->id(),
@@ -140,8 +142,6 @@ class OcorrenciaController extends Controller
             'redirect' => route('ocorrencias.index')
         ]);
     }
-
-
 
     public function show(Ocorrencia $ocorrencia)
     {
