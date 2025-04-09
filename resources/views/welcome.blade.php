@@ -10,21 +10,29 @@
         </div>
         <!-- Título -->
         <h1 class="display-4 fw-bold mb-3">Ajude a melhorar nossa cidade</h1>
-        <p class="lead mb-4">Registre problemas urbanos e acompanhe a solução em tempo real.</p>
+        <p class="lead mb-4">Registre problemas e acompanhe a solução em tempo real.</p>
         
         <!-- Botão de ação para Ocorrências -->
-        <a href="{{ route('ocorrencias.index') }}" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary">
-            <i class="fas fa-map-marker-alt"></i> Ocorrências
+        <a href="{{ route('ocorrencias.index') }}" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary btn-mobile-full">
+            <i class="fas fa-map-marker-alt"></i>  Publicações
         </a>
 
         <!-- Botão de ação para Vagas de Emprego -->
-        <a href="{{ route('vagas.index') }}" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary">
+        <a href="{{ route('vagas.index') }}" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary btn-mobile-full">
             <i class="fas fa-briefcase"></i> Vagas de Emprego
         </a>
         <!-- Botão de ação fale conosco -->
-        <a href="https://www.instagram.com/uairesolveoficial/" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary" target="_blank">
+        <a href="https://www.instagram.com/uairesolveoficial/" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary btn-mobile-full" target="_blank">
             <i class="fab fa-instagram"></i> Fale Conosco
         </a>        
     </div>
 </div>
+<style>
+    @media (max-width: 768px) {
+    .btn-mobile-full {
+        min-width: 65vw !important;
+    }
+}
+
+</style>
 @endsection
