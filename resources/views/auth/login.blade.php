@@ -8,8 +8,6 @@
             <dotlottie-player src="https://lottie.host/f8f5fd6c-a605-4dc4-87e1-6b1262710549/YHfstIxz3Z.lottie" background="transparent" speed="0.5" style="width: 300px; height: 300px" loop autoplay></dotlottie-player>
 
         </div>
-        <h2 class="text-center mb-4">Login</h2>
-
         <!-- Exibição de erros -->
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -32,11 +30,11 @@
             @csrf
             <div class="mb-3">
                 <label for="email" class="form-label">E-mail</label>
-                <input type="email" name="email" class="form-control" required value="{{ old('email') }}">
+                <input type="email" name="email" placeholder="Digite seu email" class="form-control" required value="{{ old('email') }}">
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Senha</label>
-                <input type="password" name="password" class="form-control" required>
+                <input type="password" name="password" placeholder="Digite sua senha"  class="form-control" required>
             </div>
             <button type="submit" class="btn btn-primary w-100">Entrar</button>
         </form>
