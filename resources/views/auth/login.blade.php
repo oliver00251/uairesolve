@@ -52,6 +52,6 @@
     width: 400px;
     min-height: 100vh !important;
     display: flex !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
     }
 </style>
