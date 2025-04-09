@@ -47,7 +47,7 @@
 @endsection
 <style>
     .card_login{
-    width: 400px;
+    width: 300px;
     min-height: 100vh !important;
     display: flex !important;
     justify-content: flex-start !important;
