@@ -41,6 +41,22 @@
 .scrolling-wrapper::-webkit-scrollbar {
     display: none;
 }
+@media (max-width: 768px) {
+    .scrolling-wrapper {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 5px;
+        scrollbar-width: none;
+        justify-content: flex-start !important;
+    }
+
+    .scrolling-wrapper::-webkit-scrollbar {
+        display: none;
+    }
+}
+
 .filtro-btn {
     border-radius: 20px;
     padding: 5px 15px;
