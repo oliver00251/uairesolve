@@ -1,17 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="d-flex justify-content-center align-items-center min-vh-100 bg-login">
+<div class="d-flex justify-content-center align-items-center min-vh-100 div_pr bg-login">
     <div class="card shadow p-4 card_login">
         <!-- Animação -->
-        <div class="text-center mb-3">
+        <div class="d-flex justify-content-center mb-3">
             <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
             <dotlottie-player 
                 src="https://lottie.host/f8f5fd6c-a605-4dc4-87e1-6b1262710549/YHfstIxz3Z.lottie" 
                 background="transparent" 
                 speed="0.5" 
                 style="width: 220px; height: 220px" 
-                loop autoplay>
+                 autoplay>
             </dotlottie-player>
         </div>
 
@@ -56,7 +56,7 @@
 
 <style>
     .bg-login {
-        background: linear-gradient(to right, #e9f0ff, #f6f8ff);
+        background: linear-gradient(180deg, #0052D4, #4364F7, #6FB1FC) !important;
     }
 
     .card_login {
@@ -68,7 +68,7 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         animation: fadeIn 0.8s ease-in-out;
     }
-
+   
     .input-custom {
         border-radius: 8px;
         border: 1px solid #ced4da;
@@ -99,5 +99,9 @@
         .bg-login {
             padding: 1rem;
         }
+        .div_pr{
+        margin-top: -70px;
+    }
+
     }
 </style>
