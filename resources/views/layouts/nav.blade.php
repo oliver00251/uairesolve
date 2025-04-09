@@ -1,75 +1,46 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm fixed-top">
-    <div class="container">
-        <!-- Logo -->
+<nav class="navbar navbar-light bg-white shadow-sm fixed-top d-lg-none">
+    <div class="container d-flex justify-content-between align-items-center">
         <a class="navbar-brand fw-bold text-primary" href="/">UaiResolve</a>
 
-        <!-- Botão para mobile -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+        <!-- Botão que abre o menu lateral -->
+        <button class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu">
+            <i class="fas fa-bars"></i>
         </button>
-
-        <!-- Itens do Menu -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mx-auto">
-                <!-- Outros itens do menu, caso necessário -->
-            </ul>
-
-            @auth
-                <!-- Ícone de Notificações -->
-                <a class="nav-link position-relative me-3 d-none" href="#">
-                    <i class="fas fa-bell fs-5"></i>
-                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">3</span>
-                </a>
-
-                <!-- Botão de Ocorrência com Dropdown (ao lado do Perfil) -->
-               {{--  <div class="dropdown me-3">
-                    <button class="btn btn-primary dropdown-toggle" type="button" id="ocorrenciaDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-clipboard-list"></i> Ocorrência
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="ocorrenciaDropdown">
-                
-                        <li>
-                            <a class="dropdown-item" href="{{ route('ocorrencias.index', ['filtro' => 'O']) }}"><i class="fas fa-exclamation-circle"></i> Ocorrências</a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('ocorrencias.index', ['filtro' => 'S']) }}"><i class="fas fa-lightbulb"></i> Sugestões</a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item d-none" href="{{ route('ocorrencias.index', ['filtro' => 'I']) }}"><i class="fas fa-user-check"></i> Indicações</a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item d-none" href="{{ route('ocorrencias.index', ['filtro' => 'D']) }}"><i class="fas fa-bullhorn"></i> Denúncias</a>
-                        </li>
-                    </ul>
-                    
-                </div> --}}
-
-                <!-- Perfil do Usuário -->
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userMenu"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user-circle"></i> {{ Auth::user()->name }}
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                        <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-user"></i> Meu Perfil</a></li>
-{{--                         <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Configurações</a></li>
- --}}                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="dropdown-item text-danger">
-                                    <i class="fas fa-sign-out-alt"></i> Sair
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            @else
-                <a href="{{ route('login') }}" class="btn btn-outline-primary ms-2">
-                    <i class="fas fa-sign-in-alt"></i> Entrar
-                </a>
-            @endauth
-        </div>
     </div>
 </nav>
+
+<!-- Offcanvas lateral -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="mobileMenuLabel">Menu</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column gap-3">
+        <a href="{{ route('ocorrencias.index') }}" class="btn btn-primary w-100 rounded-pill">
+            <i class="fas fa-map-marker-alt"></i> Publicações
+        </a>
+        <a href="{{ route('vagas.index') }}" class="btn btn-primary w-100 rounded-pill">
+            <i class="fas fa-briefcase"></i> Vagas de Emprego
+        </a>
+        <a href="https://www.instagram.com/uairesolveoficial/" target="_blank" class="btn btn-primary w-100 rounded-pill">
+            <i class="fab fa-instagram"></i> Fale Conosco
+        </a>
+
+        @auth
+            <hr>
+            <a href="/dashboard" class="btn btn-outline-secondary w-100">
+                <i class="fas fa-user-circle"></i> {{ Auth::user()->name }}
+            </a>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-outline-danger w-100">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </form>
+        @else
+            <a href="{{ route('login') }}" class="btn btn-outline-primary w-100">
+                <i class="fas fa-sign-in-alt"></i> Entrar
+            </a>
+        @endauth
+    </div>
+</div>
