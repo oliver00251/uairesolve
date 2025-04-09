@@ -16,8 +16,8 @@
                     <div class="col-12 col-md-3 mb-3">
                         <div class="card ocorrencia-card h-100">
                             <div class="ocorrencia-capa-wrapper">
-                                <img src="{{ asset('storage/' . $ocorrencia->imagem) }}"
-                                     class="ocorrencia-capa">
+                                <img src="{{ $ocorrencia->imagem ? asset('storage/' . $ocorrencia->imagem) : 'https://uairesolve.com.br/storage/ocorrencias/67f676bcac663.png' }}"
+                            class="ocorrencia-capa">
                             </div>
                             <div class="card-body d-flex flex-column justify-content-between">
                                 <!-- Cabeçalho: Categoria e Status -->
