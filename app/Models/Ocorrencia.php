@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,9 +18,9 @@ class Ocorrencia extends Model
     }
     // Relacionamento com Comentários
     public function categoria()
-{
-    return $this->belongsTo(Categoria::class, 'categoria_id');
-}
+    {
+        return $this->belongsTo(Categoria::class, 'categoria_id');
+    }
     // Relacionamento com Likes
     public function likes()
     {
@@ -42,5 +43,35 @@ class Ocorrencia extends Model
     public function link()
     {
         return $this->belongsTo(Link::class, 'link_id');
+    }
+
+    public function statusLogs()
+    {
+        return $this->hasMany(OcorrenciaStatusLog::class);
+    }
+
+    public function ultimoStatusLog()
+    {
+        return $this->hasOne(OcorrenciaStatusLog::class)->latestOfMany();
+    }
+
+
+    public function logStatusChange($novoStatus, $comentario = null, $alteradoPor = null)
+    {
+        $statusAnterior = $this->status;
+
+        if ($statusAnterior === $novoStatus) {
+            return;
+        }
+
+        $this->status = $novoStatus;
+        $this->save();
+
+        $this->statusLogs()->create([
+            'status_anterior' => $statusAnterior,
+            'status_novo'     => $novoStatus,
+            'comentario'      => $comentario,
+            'alterado_por'    => $alteradoPor,
+        ]);
     }
 }

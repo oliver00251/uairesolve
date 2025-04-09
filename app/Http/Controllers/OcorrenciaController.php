@@ -21,24 +21,38 @@ class OcorrenciaController extends Controller
 
     public function index(Request $request)
     {
-        // Pega o filtro da query string (exemplo: ?categoria=2)
-        $filtro = $request->query('categoria');
-    
-        $ocorrencias = Ocorrencia::where('status', 'Aberta')
-            ->when($filtro, function ($query) use ($filtro) {
-                return $query->where('categoria_id', $filtro);
+        $categoriaId = $request->query('categoria');
+        $status = $request->query('status');
+
+        $ocorrencias = Ocorrencia::where('status', '!=', 'Arquivada')
+            ->when($categoriaId, function ($query) use ($categoriaId) {
+                return $query->where('categoria_id', $categoriaId);
             })
-            ->with('categoria')
+            ->when($status, function ($query) use ($status) {
+                return $query->where('status', $status);
+            })
+            ->with('categoria', 'ultimoStatusLog')
             ->latest()
             ->get();
-    
+
         $categorias = Categoria::whereIn('nome', ['Ajuda', 'Causa Animal', 'Sugestão', 'Eventos', 'Denúncias', 'Reclamação'])
             ->orderBy('nome', 'asc')
             ->get();
-    
-        return view('ocorrencias.index', compact('ocorrencias', 'filtro', 'categorias'));
+
+        $statusList = ['Aberta', 'Em andamento', 'Resolvida']; // ou busca direto do Enum/Model
+
+        return view('ocorrencias.index', [
+            'ocorrencias' => $ocorrencias,
+            'categorias' => $categorias,
+            'statusList' => $statusList,
+            'categoriaId' => $categoriaId,
+            'status' => $status,
+            'filtro' => $categoriaId // pra não quebrar o que já tá usando $filtro na view
+        ]);
+        
     }
-    
+
+
     public function create()
     {
 
@@ -187,8 +201,8 @@ class OcorrenciaController extends Controller
             'descricao' => 'required|string',
             'localizacao' => 'nullable|string',
             'status' => 'required|in:Aberta,Em andamento,Resolvida,Excluir',
-            'imagem' => 'nullable|image|mimes:jpeg,png,gif|max:20480', // Limite de 20MB
-            'link' => 'nullable', // Validar o link, se fornecido
+            'imagem' => 'nullable|image|mimes:jpeg,png,gif|max:20480', // 20MB
+            'link' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -198,39 +212,35 @@ class OcorrenciaController extends Controller
             ]);
         }
 
-        // Preenchendo os dados diretamente no modelo
+        // Atualiza os campos padrão
         $ocorrencia->titulo = $request->input('titulo');
         $ocorrencia->descricao = $request->input('descricao');
         $ocorrencia->localizacao = $request->input('localizacao');
-        $ocorrencia->status = $request->input('status') == 'Excluir' ? 'Arquivada' : $request->input('status');
 
-        // Garantir que tipo e categoria_id sejam iguais
+        // Atualiza tipo e categoria
         $categoria = Categoria::find($request->input('tipo'));
         $ocorrencia->tipo = $request->input('tipo');
-        $ocorrencia->categoria_id = $request->input('tipo'); // Atualiza o ID da categoria
+        $ocorrencia->categoria_id = $request->input('tipo');
 
-        // Atualizar o link, se fornecido
+        // Atualiza ou cria o link
         if ($request->filled('link')) {
-            // Verifica se já existe um link associado
             $link = Link::find($ocorrencia->link_id);
+
             if ($link) {
-                // Se o link existir, atualiza a URL
                 $link->url = $request->input('link');
                 $link->save();
             } else {
-                // Se não existir, cria um novo link
                 $link = new Link();
                 $link->url = $request->input('link');
                 $link->categoria_id = $categoria->id;
                 $link->descricao = $categoria->descricao;
                 $link->save();
 
-                // Associa o link criado à ocorrência
                 $ocorrencia->link_id = $link->id;
             }
         }
 
-        // Processa a imagem, se houver
+        // Processa imagem
         if ($request->hasFile('imagem')) {
             try {
                 $ocorrencia->imagem = $this->imageService->processAndSave($request->file('imagem'));
@@ -242,7 +252,11 @@ class OcorrenciaController extends Controller
             }
         }
 
-        // Salva a ocorrência atualizada no banco de dados
+        // LOGICA DE STATUS: agora com log automático
+        $novoStatus = $request->input('status') == 'Excluir' ? 'Arquivada' : $request->input('status');
+        $ocorrencia->logStatusChange($novoStatus, 'Status alterado via painel', auth()->id());
+
+        // Salva as demais alterações no banco
         $ocorrencia->save();
 
         return response()->json([
@@ -251,10 +265,6 @@ class OcorrenciaController extends Controller
             'redirect' => route('ocorrencias.index')
         ]);
     }
-
-
-
-
 
     public function destroy(Ocorrencia $ocorrencia)
     {
@@ -280,87 +290,84 @@ class OcorrenciaController extends Controller
         return $ocorrencia->user_id === auth()->id() || auth()->user()->is_admin;
     }
 
-    public function gerarImagem($id=1) 
-{
-    $ocorrencia = Ocorrencia::find($id);
+    public function gerarImagem($id = 1)
+    {
+        $ocorrencia = Ocorrencia::find($id);
 
-    if (!$ocorrencia) {
-        return response()->json(['error' => 'Ocorrência não encontrada!'], 404);
+        if (!$ocorrencia) {
+            return response()->json(['error' => 'Ocorrência não encontrada!'], 404);
+        }
+
+        // Caminho da imagem base
+        $imagemBase = public_path('images/img_modelo.png');
+
+        if (!file_exists($imagemBase)) {
+            return response()->json(['error' => 'Imagem base não encontrada!'], 404);
+        }
+
+        $imagem = imagecreatefrompng($imagemBase);
+
+        // Definir cores do texto
+        $corAzul = imagecolorallocate($imagem, 0, 91, 187);
+        $corPreto = imagecolorallocate($imagem, 50, 50, 50);
+
+        // Definir a fonte
+        $fonte = public_path('fonts/ARIAL.TTF');
+
+        if (!file_exists($fonte)) {
+            return response()->json(['error' => 'Fonte não encontrada!'], 404);
+        }
+
+        // Textos dinâmicos
+        $categoria = mb_strtoupper($ocorrencia->categoria->nome ?? 'Outros', 'UTF-8');
+        $titulo = mb_strtoupper($ocorrencia->titulo, 'UTF-8');
+        $descricao = strip_tags($ocorrencia->descricao);
+        $descricao = preg_replace('/[^\p{L}\p{N}\p{P}\p{Z}]/u', '', $descricao); // Remove emojis e caracteres não suportados        
+        $dataPublicacao = "\nPublicado em: \n" . $ocorrencia->created_at->format('d/m/Y');
+        $site = "Veja a publicação completa em:\n" . "uairesolve.com.br\n" . $dataPublicacao;
+
+        // Limitar descrição a no máximo 50 palavras
+        $palavras = explode(' ', $descricao);
+        if (count($palavras) > 29) {
+            $descricao = implode(' ', array_slice($palavras, 0, 45)) . '...';
+        }
+
+        // Quebrar o título e a descrição corretamente
+        $tituloQuebrado = wordwrap($titulo, 30, "\n", true);
+        $descricaoQuebrada = wordwrap($descricao, 35, "\n", true);
+
+        // Posições iniciais
+        imagettftext($imagem, 32, 0, 350, 140, $corAzul, $fonte, $categoria);
+
+        // Renderizar o título quebrado
+        $posY = 170;
+        foreach (explode("\n", $tituloQuebrado) as $linha) {
+            imagettftext($imagem, 17, 0, 350, $posY, $corAzul, $fonte, $linha);
+            $posY += 25; // Ajuste de espaçamento
+        }
+
+        // Renderizar a descrição com quebra de linha
+        $posY += 30; // Ajuste para dar espaço entre o título e a descrição
+        foreach (explode("\n", $descricaoQuebrada) as $linha) {
+            imagettftext($imagem, 20, 0, 350, $posY, $corPreto, $fonte, $linha);
+            $posY += 30; // Ajuste para a próxima linha
+        }
+
+        // Adicionar o site
+        imagettftext($imagem, 16, 0, 350, $posY + 10, $corPreto, $fonte, $site);
+
+        // Criar a pasta 'geradas' se não existir
+        $caminhoPasta = public_path('geradas');
+        if (!file_exists($caminhoPasta)) {
+            mkdir($caminhoPasta, 0777, true);
+        }
+
+        // Caminho para salvar a imagem final
+        $caminhoSaida = $caminhoPasta . '/imagem_final.png';
+        imagepng($imagem, $caminhoSaida);
+        imagedestroy($imagem);
+
+        // Retornar a URL da imagem gerada
+        return response()->download($caminhoSaida, 'ocorrencia_' . $id . '.png');
     }
-
-    // Caminho da imagem base
-    $imagemBase = public_path('images/img_modelo.png');
-
-    if (!file_exists($imagemBase)) {
-        return response()->json(['error' => 'Imagem base não encontrada!'], 404);
-    }
-
-    $imagem = imagecreatefrompng($imagemBase);
-
-    // Definir cores do texto
-    $corAzul = imagecolorallocate($imagem, 0, 91, 187);
-    $corPreto = imagecolorallocate($imagem, 50, 50, 50);
-
-    // Definir a fonte
-    $fonte = public_path('fonts/ARIAL.TTF');
-
-    if (!file_exists($fonte)) {
-        return response()->json(['error' => 'Fonte não encontrada!'], 404);
-    }
-
-    // Textos dinâmicos
-    $categoria = mb_strtoupper($ocorrencia->categoria->nome ?? 'Outros', 'UTF-8');
-    $titulo = mb_strtoupper($ocorrencia->titulo, 'UTF-8');
-    $descricao = strip_tags($ocorrencia->descricao);
-    $descricao = preg_replace('/[^\p{L}\p{N}\p{P}\p{Z}]/u', '', $descricao); // Remove emojis e caracteres não suportados        
-    $dataPublicacao = "\nPublicado em: \n" . $ocorrencia->created_at->format('d/m/Y');
-    $site = "Veja a publicação completa em:\n" . "uairesolve.com.br\n". $dataPublicacao;
-
-    // Limitar descrição a no máximo 50 palavras
-    $palavras = explode(' ', $descricao);
-    if (count($palavras) > 29) {
-        $descricao = implode(' ', array_slice($palavras, 0, 45)) . '...';
-    }
-
-    // Quebrar o título e a descrição corretamente
-    $tituloQuebrado = wordwrap($titulo, 30, "\n", true);
-    $descricaoQuebrada = wordwrap($descricao, 35, "\n", true);
-
-    // Posições iniciais
-    imagettftext($imagem, 32, 0, 350, 140, $corAzul, $fonte, $categoria);
-
-    // Renderizar o título quebrado
-    $posY = 170;
-    foreach (explode("\n", $tituloQuebrado) as $linha) {
-        imagettftext($imagem, 17, 0, 350, $posY, $corAzul, $fonte, $linha);
-        $posY += 25; // Ajuste de espaçamento
-    }
-
-    // Renderizar a descrição com quebra de linha
-    $posY += 30; // Ajuste para dar espaço entre o título e a descrição
-    foreach (explode("\n", $descricaoQuebrada) as $linha) {
-        imagettftext($imagem, 20, 0, 350, $posY, $corPreto, $fonte, $linha);
-        $posY += 30; // Ajuste para a próxima linha
-    }
-
-    // Adicionar o site
-    imagettftext($imagem, 16, 0, 350, $posY + 10, $corPreto, $fonte, $site);
-
-    // Criar a pasta 'geradas' se não existir
-    $caminhoPasta = public_path('geradas');
-    if (!file_exists($caminhoPasta)) {
-        mkdir($caminhoPasta, 0777, true);
-    }
-
-    // Caminho para salvar a imagem final
-    $caminhoSaida = $caminhoPasta . '/imagem_final.png';
-    imagepng($imagem, $caminhoSaida);
-    imagedestroy($imagem);
-
-    // Retornar a URL da imagem gerada
-    return response()->download($caminhoSaida, 'ocorrencia_'.$id.'.png');
-}
-
-
-
 }

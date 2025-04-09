@@ -19,7 +19,7 @@
 
         <!-- Botão de ação para Vagas de Emprego -->
         <a href="{{ route('vagas.index') }}" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary">
-            <i class="fas fa-briefcase"></i> Ver Vagas de Emprego
+            <i class="fas fa-briefcase"></i> Vagas de Emprego
         </a>
     </div>
 </div>
