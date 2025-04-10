@@ -64,7 +64,7 @@ class ImpactoController extends Controller
             'por_tipo' => $por_tipo,
             'por_tipo_resolvidas' => $por_tipo_resolvidas,
             'evolucao_diaria' => $evolucao_diaria,
-            'visitas_totais' => $total_visitas,
+            'total_visitas' => $total_visitas,
             'visitantes_unicos' => $visitantes_unicos,
         ];
 
