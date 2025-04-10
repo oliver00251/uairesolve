@@ -13,6 +13,10 @@
             <!-- Título -->
             <h1 class="display-4 fw-bold mb-3">Ajude a melhorar nossa cidade</h1>
             <p class="lead mb-4">Registre problemas e acompanhe a solução em tempo real.</p>
+            <!-- Botão Impacto -->
+            <a href="{{ route('impacto.publico') }}" class="btn btn-light mt-3 btn-lg px-4 d-none d-lg-block rounded-pill text-primary btn-mobile-full">
+                <i class="fas fa-chart-line"></i> Dados da Cidade
+            </a>
             <div class="d-block d-lg-none">
                 <!-- Botão de ação para Ocorrências -->
                 <a href="{{ route('ocorrencias.index') }}"
@@ -25,6 +29,11 @@
                     class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary btn-mobile-full">
                     <i class="fas fa-briefcase"></i> Vagas de Emprego
                 </a>
+                <!-- Botão Impacto -->
+                <a href="{{ route('impacto.publico') }}" class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary btn-mobile-full">
+                    <i class="fas fa-chart-line"></i>Dados da Cidade
+                </a>
+                
                 <!-- Botão de ação fale conosco -->
                 <a href="https://www.instagram.com/uairesolveoficial/"
                     class="btn btn-light mt-3 btn-lg px-4 rounded-pill text-primary btn-mobile-full" target="_blank">
