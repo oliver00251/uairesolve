@@ -43,16 +43,15 @@ class ImpactoController extends Controller
             $ip_para_ignorar = '187.109.62.154';
 
             // Total de visitas (sem contar o IP ignorado)
-            $total_visitas = DB::table('access_logs')
+            $visitas_totais = DB::table('access_logs')
                 ->where('ip_address', '!=', $ip_para_ignorar)
                 ->count();
             
             // Visitantes únicos (sem contar o IP ignorado)
             $visitantes_unicos = DB::table('access_logs')
                 ->where('ip_address', '!=', $ip_para_ignorar)
-                ->select('ip_address')
-                ->distinct()
-                ->count();
+                ->distinct('ip_address')
+    ->count('ip_address');
     
 
         // Dados agregados que serão passados pra view
@@ -64,7 +63,7 @@ class ImpactoController extends Controller
             'por_tipo' => $por_tipo,
             'por_tipo_resolvidas' => $por_tipo_resolvidas,
             'evolucao_diaria' => $evolucao_diaria,
-            'total_visitas' => $total_visitas,
+            'visitas_totais' => $visitas_totais,
             'visitantes_unicos' => $visitantes_unicos,
         ];
 
