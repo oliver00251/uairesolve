@@ -23,6 +23,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('impacto.publico') }}" class="nav-link">
+                        <i class="fas fa-chart-line text-primary"></i> Visualizar Métricas da Cidade 
+                    </a>
+                </li>
+                
+                <li class="nav-item">
                     <a class="nav-link" href="https://www.instagram.com/uairesolveoficial/" target="_blank">
                         <i class="fab fa-instagram text-primary"></i> Fale Conosco
                     </a>
@@ -71,6 +77,7 @@
         <a href="{{ route('vagas.index') }}" class="btn btn-primary w-100 rounded-pill">
             <i class="fas fa-briefcase"></i> Vagas de Emprego
         </a>
+       
         <a href="https://www.instagram.com/uairesolveoficial/" class="btn btn-primary w-100 rounded-pill" target="_blank">
             <i class="fab fa-instagram"></i> Fale Conosco
         </a>
