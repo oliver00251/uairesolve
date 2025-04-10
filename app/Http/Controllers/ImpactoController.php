@@ -40,12 +40,19 @@ class ImpactoController extends Controller
             ->orderBy('dia')
             ->get();
 
-        // Total de acessos (visitas) e visitantes únicos (baseado em IP)
-        $total_visitas = DB::table('access_logs')->count();
+            $ip_para_ignorar = '187.109.62.154';
 
-        $visitantes_unicos = DB::table('access_logs')
-        ->distinct('ip_address')
-        ->count('ip_address');
+            // Total de visitas (sem contar o IP ignorado)
+            $total_visitas = DB::table('access_logs')
+                ->where('ip_address', '!=', $ip_para_ignorar)
+                ->count();
+            
+            // Visitantes únicos (sem contar o IP ignorado)
+            $visitantes_unicos = DB::table('access_logs')
+                ->where('ip_address', '!=', $ip_para_ignorar)
+                ->select('ip_address')
+                ->distinct()
+                ->count();
     
 
         // Dados agregados que serão passados pra view
