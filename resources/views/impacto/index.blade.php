@@ -18,7 +18,8 @@
                 text-align: center;
                 height: 100%;
                 display: flex;
-                justify-content: space-between;
+                flex-direction: column;
+                justify-content: center;
                 align-items: center;
             }
 
@@ -94,7 +95,7 @@
             }
         </style>
 
-        {{-- Indicadores rápidos --}}
+        {{-- Indicadores principais --}}
         <div class="row g-4 mb-5">
             @php
                 $cards = [
@@ -106,6 +107,27 @@
             @endphp
 
             @foreach ($cards as $card)
+                <div class="col-md-3 col-sm-6">
+                    <div class="card-custom">
+                        <i class="fas {{ $card['icone'] }}" style="color: {{ $card['cor'] }}"></i>
+                        <div class="card-label">{{ $card['label'] }}</div>
+                        <div class="card-value">{{ $card['valor'] }}</div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        {{-- Indicadores de Acesso --}}
+        <h4 class="mb-4 fw-bold text-secondary">👥 Acesso e Engajamento</h4>
+        <div class="row g-4 mb-5">
+            @php
+                $acessos = [
+                    ['label' => 'Visitas Totais', 'valor' => $dados['visitas_totais'], 'cor' => '#6f42c1', 'icone' => 'fa-eye'],
+                    ['label' => 'Visitantes Únicos', 'valor' => $dados['visitantes_unicos'], 'cor' => '#fd7e14', 'icone' => 'fa-user-friends'],
+                ];
+            @endphp
+
+            @foreach ($acessos as $card)
                 <div class="col-md-3 col-sm-6">
                     <div class="card-custom">
                         <i class="fas {{ $card['icone'] }}" style="color: {{ $card['cor'] }}"></i>

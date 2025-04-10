@@ -3,21 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ocorrencia;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ImpactoController extends Controller
 {
     public function index()
     {
-        // Traz o nome da categoria direto do banco via JOIN
+        // Ocorrências por tipo (com JOIN pra puxar o nome da categoria)
         $por_tipo = DB::table('ocorrencias')
             ->join('categorias', 'ocorrencias.categoria_id', '=', 'categorias.id')
-            ->select('categorias.nome as categoria_nome', 'ocorrencias.categoria_id', DB::raw('count(*) as total'))
+            ->select(
+                'categorias.nome as categoria_nome',
+                'ocorrencias.categoria_id',
+                DB::raw('count(*) as total')
+            )
             ->groupBy('ocorrencias.categoria_id', 'categorias.nome')
             ->get();
-    
-        // Subdados: porcentagem de resolvidas por tipo
+
+        // Ocorrências resolvidas por tipo (com cálculo de % resolvidas)
         $por_tipo_resolvidas = DB::table('ocorrencias')
             ->join('categorias', 'ocorrencias.categoria_id', '=', 'categorias.id')
             ->select(
@@ -28,15 +31,24 @@ class ImpactoController extends Controller
             )
             ->groupBy('ocorrencias.categoria_id', 'categorias.nome')
             ->get();
-    
-        // Ocorrências dos últimos 15 dias
+
+        // Ocorrências dos últimos 15 dias (pra mostrar evolução no tempo)
         $evolucao_diaria = Ocorrencia::with('categoria')
             ->selectRaw('DATE(created_at) as dia, COUNT(*) as total')
             ->where('created_at', '>=', now()->subDays(14))
             ->groupByRaw('DATE(created_at)')
             ->orderBy('dia')
             ->get();
+
+        // Total de acessos (visitas) e visitantes únicos (baseado em IP)
+        $total_visitas = DB::table('access_logs')->count();
+
+        $visitantes_unicos = DB::table('access_logs')
+        ->distinct('ip_address')
+        ->count('ip_address');
     
+
+        // Dados agregados que serão passados pra view
         $dados = [
             'total_ocorrencias' => Ocorrencia::count(),
             'resolvidas' => Ocorrencia::where('status', 'Resolvida')->count(),
@@ -45,9 +57,10 @@ class ImpactoController extends Controller
             'por_tipo' => $por_tipo,
             'por_tipo_resolvidas' => $por_tipo_resolvidas,
             'evolucao_diaria' => $evolucao_diaria,
+            'visitas_totais' => $total_visitas,
+            'visitantes_unicos' => $visitantes_unicos,
         ];
-    
+
         return view('impacto.index', compact('dados'));
     }
-    
 }
