@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ComentarioController;
+use App\Http\Controllers\ImpactoController;
 use App\Http\Controllers\OcorrenciaController;
 use App\Http\Controllers\OcorrenciaLikeController;
 use App\Http\Controllers\ParceiroController;
@@ -32,6 +33,7 @@ Route::get('auth/redirect/google', [AuthController::class, 'redirectToGoogle']);
 // Recebe o callback do Google
 Route::get('auth/callback/google', [AuthController::class, 'handleGoogleCallback']);
 
+Route::get('/impacto', [ImpactoController::class, 'index'])->name('impacto.publico');
 
 
 # Ocorrencias
