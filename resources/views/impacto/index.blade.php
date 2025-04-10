@@ -103,19 +103,21 @@
                     ['label' => 'Resolvidas', 'valor' => $dados['resolvidas'], 'cor' => '#00c292', 'icone' => 'fa-check-circle'],
                     ['label' => 'Pendentes', 'valor' => $dados['em_aberto'], 'cor' => '#fb9678', 'icone' => 'fa-hourglass-half'],
                     ['label' => 'Hoje', 'valor' => $dados['hoje'], 'cor' => '#009efb', 'icone' => 'fa-calendar-day'],
+                    
                 ];
             @endphp
-
+        
             @foreach ($cards as $card)
-                <div class="col-md-3 col-sm-6">
-                    <div class="card-custom">
-                        <i class="fas {{ $card['icone'] }}" style="color: {{ $card['cor'] }}"></i>
-                        <div class="card-label">{{ $card['label'] }}</div>
-                        <div class="card-value">{{ $card['valor'] }}</div>
+                <div class="col-6 col-md-3">
+                    <div class="card-custom text-center">
+                        <i class="fas {{ $card['icone'] }}" style="color: {{ $card['cor'] }}; font-size: 1.5rem;"></i>
+                        <div class="card-label mt-2">{{ $card['label'] }}</div>
+                        <div class="card-value fw-bold fs-4">{{ $card['valor'] }}</div>
                     </div>
                 </div>
             @endforeach
         </div>
+        
 
         {{-- Indicadores de Acesso --}}
         <h4 class="mb-4 fw-bold text-secondary">👥 Acesso e Engajamento</h4>
@@ -126,17 +128,18 @@
                     ['label' => 'Visitantes Únicos', 'valor' => $dados['visitantes_unicos'], 'cor' => '#fd7e14', 'icone' => 'fa-user-friends'],
                 ];
             @endphp
-
+        
             @foreach ($acessos as $card)
-                <div class="col-md-3 col-sm-6">
-                    <div class="card-custom">
-                        <i class="fas {{ $card['icone'] }}" style="color: {{ $card['cor'] }}"></i>
-                        <div class="card-label">{{ $card['label'] }}</div>
-                        <div class="card-value">{{ $card['valor'] }}</div>
+                <div class="col-6 col-md-3">
+                    <div class="card-custom text-center">
+                        <i class="fas {{ $card['icone'] }}" style="color: {{ $card['cor'] }}; font-size: 1.5rem;"></i>
+                        <div class="card-label mt-2">{{ $card['label'] }}</div>
+                        <div class="card-value fw-bold fs-4">{{ $card['valor'] }}</div>
                     </div>
                 </div>
             @endforeach
         </div>
+        
 
         {{-- Ocorrências por tipo --}}
         <hr class="my-5 border-top border-2 border-primary-subtle">
