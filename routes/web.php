@@ -82,12 +82,12 @@ Route::resource('vagas', VagaEmpregoController::class);
 
 Route::get('/test-pdf', function () {
     try {
-        Browsershot::html('<h1>Hello Uai Resolve!</h1>')
-            ->setNodeBinary('/home/u315703485/node-local/bin/node')
-            ->setNpmBinary('/home/u315703485/node-local/bin/npm')
-            ->noSandbox()
-            ->timeout(60)
-            ->save(storage_path('app/public/teste.png'));
+        Browsershot::html('<h1>Hello</h1>')
+    ->setNodeBinary('/home/u315703485/node-local/bin/node')
+    ->setNpmBinary('/home/u315703485/node-local/bin/npm')
+    ->setChromePath('/usr/bin/chromium') // ou o que aparecer
+    ->noSandbox()
+    ->save(storage_path('app/public/teste.png'));
 
         return 'Imagem gerada com sucesso!';
     } catch (\Exception $e) {
