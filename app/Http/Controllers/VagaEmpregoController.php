@@ -154,7 +154,6 @@ class VagaEmpregoController extends Controller
         Log::error('Erro ao gerar imagem da vaga: ' . $e->getMessage(), [
             'exception' => $e
         ]);
-        dd($e);
         // 🔍 Exibe pro navegador (pode tirar em produção)
         return response()->json([
             'erro' => true,
