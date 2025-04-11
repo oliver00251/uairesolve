@@ -80,19 +80,4 @@ Route::get('/vagas-imagem/{id}', [VagaEmpregoController::class, 'gerarImagem'])-
 
 Route::resource('vagas', VagaEmpregoController::class);
 
-Route::get('/test-pdf', function () {
-    try {
-        Browsershot::html('<h1>Hello</h1>')
-    ->setNodeBinary('/home/u315703485/node-local/bin/node')
-    ->setNpmBinary('/home/u315703485/node-local/bin/npm')
-    ->setChromePath('/usr/bin/chromium') // ou o que aparecer
-    ->noSandbox()
-    ->save(storage_path('app/public/teste.png'));
-
-        return 'Imagem gerada com sucesso!';
-    } catch (\Exception $e) {
-        return 'Erro: ' . $e->getMessage();
-    }
-});
-
 
