@@ -10,7 +10,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\VagaEmpregoController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
-
+use Spatie\Browsershot\Browsershot;
 
 /*
 |-------------------------------------------------------------------------- 
@@ -80,6 +80,19 @@ Route::get('/vagas-imagem/{id}', [VagaEmpregoController::class, 'gerarImagem'])-
 
 Route::resource('vagas', VagaEmpregoController::class);
 
+Route::get('/test-pdf', function () {
+    try {
+        Browsershot::html('<h1>Hello Uai Resolve!</h1>')
+            ->setNodeBinary('/home/u315703485/node-local/bin/node')
+            ->setNpmBinary('/home/u315703485/node-local/bin/npm')
+            ->noSandbox()
+            ->timeout(60)
+            ->save(storage_path('app/public/teste.png'));
 
+        return 'Imagem gerada com sucesso!';
+    } catch (\Exception $e) {
+        return 'Erro: ' . $e->getMessage();
+    }
+});
 
 
