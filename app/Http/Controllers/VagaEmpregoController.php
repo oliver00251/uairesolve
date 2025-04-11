@@ -121,33 +121,23 @@ class VagaEmpregoController extends Controller
     
         $nomeArquivo = 'vaga-' . Str::slug($vaga->titulo) . '-' . $vaga->id . '.png';
     
-        // Verifica se está em ambiente de produção ou local
-        if (App::environment('production')) {
-            // Ambiente de produção
-            $caminhoPasta = public_path('storage/vagas');  // Caminho público em produção
-        } else {
-            // Ambiente local
-            $caminhoPasta = storage_path('app/public/vagas');  // Caminho local em desenvolvimento
-        }
+        $caminhoPasta = App::environment('production')
+            ? public_path('storage/vagas')
+            : storage_path('app/public/vagas');
     
         $caminhoCompleto = $caminhoPasta . '/' . $nomeArquivo;
     
-        // ✅ Garante que a pasta exista
         if (!File::exists($caminhoPasta)) {
             File::makeDirectory($caminhoPasta, 0755, true);
         }
     
-        // Geração da imagem
+        $nodePath = App::environment('production')
+            ? '/home/u315703485/node-local/bin/node'
+            : 'C:\Program Files\nodejs\node.exe';
+    
         $browsershot = new Browsershot();
-    
-        // Define o caminho do Node.js corretamente dependendo do ambiente
-        if (App::environment('production')) {
-            $nodePath = '/home/u315703485/node-local/bin/node';
-        } else {
-            $browsershot->setNodeBinary('C:\Program Files\nodejs\node.exe'); // Caminho local para desenvolvimento
-        }
-    
         $browsershot
+            ->setNodeBinary($nodePath)
             ->html(view('vagas.imagem', compact('vaga'))->render())
             ->windowSize(1080, 1080)
             ->setScreenshotType('png')
@@ -158,5 +148,6 @@ class VagaEmpregoController extends Controller
     
         return response()->download($caminhoCompleto);
     }
+    
     
 }
