@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\VagaEmprego;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Str; 
@@ -115,31 +116,47 @@ class VagaEmpregoController extends Controller
     }
 
     public function gerarImagem($id)
-{
-    $vaga = VagaEmprego::findOrFail($id);
-
-    $nomeArquivo = 'vaga-' . Str::slug($vaga->titulo) . '-' . $vaga->id . '.png';
-    $caminhoPasta = storage_path('app/public/vagas');
-    $caminhoCompleto = $caminhoPasta . '/' . $nomeArquivo;
-
-    // ✅ Garante que a pasta existe
-    if (!File::exists($caminhoPasta)) {
-        File::makeDirectory($caminhoPasta, 0755, true);
+    {
+        $vaga = VagaEmprego::findOrFail($id);
+    
+        $nomeArquivo = 'vaga-' . Str::slug($vaga->titulo) . '-' . $vaga->id . '.png';
+    
+        // Verifica se está em ambiente de produção ou local
+        if (App::environment('production')) {
+            // Ambiente de produção
+            $caminhoPasta = public_path('storage/vagas');  // Caminho público em produção
+        } else {
+            // Ambiente local
+            $caminhoPasta = storage_path('app/public/vagas');  // Caminho local em desenvolvimento
+        }
+    
+        $caminhoCompleto = $caminhoPasta . '/' . $nomeArquivo;
+    
+        // ✅ Garante que a pasta exista
+        if (!File::exists($caminhoPasta)) {
+            File::makeDirectory($caminhoPasta, 0755, true);
+        }
+    
+        // Geração da imagem
+        $browsershot = new Browsershot();
+    
+        // Define o caminho do Node.js corretamente dependendo do ambiente
+        if (App::environment('production')) {
+            $browsershot->setNodeBinary('/usr/local/bin/node'); // Caminho para o Node.js no servidor
+        } else {
+            $browsershot->setNodeBinary('C:\Program Files\nodejs\node.exe'); // Caminho local para desenvolvimento
+        }
+    
+        $browsershot
+            ->html(view('vagas.imagem', compact('vaga'))->render())
+            ->windowSize(1080, 1080)
+            ->setScreenshotType('png')
+            ->deviceScaleFactor(2)
+            ->noSandbox()
+            ->timeout(60)
+            ->save($caminhoCompleto);
+    
+        return response()->download($caminhoCompleto);
     }
-
-    // Geração
-    $browsershot = new Browsershot();
-    $browsershot->setNodeBinary('C:\Program Files\nodejs\node.exe');
-
-    $browsershot
-        ->html(view('vagas.imagem', compact('vaga'))->render())
-        ->windowSize(1080, 1080)
-        ->setScreenshotType('png')
-        ->deviceScaleFactor(2)
-        ->noSandbox()
-        ->timeout(60)
-        ->save($caminhoCompleto);
-
-    return response()->download($caminhoCompleto);
-}
+    
 }
