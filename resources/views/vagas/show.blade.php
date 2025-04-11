@@ -26,12 +26,7 @@
                     </div>
                     
                 </div>
-                @if (auth()->check() && auth()->user()->tipo == 'admin')
-                
-                <a href="{{ route('gerar.imagem-vaga', ['id' => $vaga->id]) }}" class="btn btn-sm btn-outline-success" download>
-                    Baixar imagem da postagem
-                </a>
-            @endif
+              
             </div>
         </div>
     </div>
