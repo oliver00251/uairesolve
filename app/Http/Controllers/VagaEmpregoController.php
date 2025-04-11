@@ -142,7 +142,7 @@ class VagaEmpregoController extends Controller
     
         // Define o caminho do Node.js corretamente dependendo do ambiente
         if (App::environment('production')) {
-            $browsershot->setNodeBinary('/usr/local/bin/node'); // Caminho para o Node.js no servidor
+            $nodePath = '/home/u315703485/node-local/bin/node';
         } else {
             $browsershot->setNodeBinary('C:\Program Files\nodejs\node.exe'); // Caminho local para desenvolvimento
         }
