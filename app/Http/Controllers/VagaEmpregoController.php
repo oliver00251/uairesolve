@@ -6,6 +6,7 @@ use App\Models\VagaEmprego;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Str;
@@ -35,7 +36,6 @@ class VagaEmpregoController extends Controller
      */
     public function store(Request $request)
     {
-        // Validação dos dados
         $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
@@ -50,15 +50,22 @@ class VagaEmpregoController extends Controller
             'link' => 'nullable|url',
         ]);
 
-        // Criar a vaga no banco
+        $hash = hash('sha256', $request->titulo . $request->link);
+        $request->merge(['hash' => $hash]);
+
+        $existe = VagaEmprego::where('hash', $hash)->exists();
+        if ($existe) {
+            return response()->json(['message' => 'Vaga duplicada.'], 200);
+        }
+
         $vaga = VagaEmprego::create($request->all());
 
-        // Retornar resposta em JSON
         return response()->json([
             'message' => 'Vaga criada com sucesso!',
             'vaga' => $vaga
-        ], 201);  // 201 indica que a vaga foi criada com sucesso
+        ], 201);
     }
+
 
     /**
      * Exibir os detalhes de uma vaga de emprego específica.
@@ -116,4 +123,38 @@ class VagaEmpregoController extends Controller
         return redirect()->route('vagas.index')->with('success', 'Vaga de emprego deletada com sucesso!');
     }
 
+    public function gerarImagem($id)
+    {
+        $vaga = VagaEmprego::findOrFail($id);
+
+        try {
+            $response = Http::post(env('MICROSERVICO_GERAR_IMAGEM'), [
+                'titulo' => $vaga->titulo,
+                'localizacao' => $vaga->localizacao,
+                'periodo' => $vaga->periodo,
+                'tipo_contrato' => $vaga->tipo_contrato,
+                'requisitos' => $vaga->requisitos,
+            ]);
+
+            if ($response->successful()) {
+                $dados = $response->json();
+                return redirect()->back()->with('sucesso', 'Imagem gerada com sucesso: ' . $dados['imagem']);
+            } else {
+                $erro = ([
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                // Se quiser manter o log também:
+                Log::error('Erro ao gerar imagem:', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+
+                return redirect()->back()->with('erro', 'Erro ao gerar imagem');
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('erro', 'Erro na requisição: ' . $e->getMessage());
+        }
+    }
 }

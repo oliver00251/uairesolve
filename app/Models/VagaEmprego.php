@@ -14,19 +14,11 @@ class VagaEmprego extends Model
 
     // Definindo os campos que podem ser preenchidos em massa (mass assignment)
     protected $fillable = [
-        'titulo',
-        'descricao',
-        'localizacao',
-        'modalidade',
-        'periodo',
-        'tipo_contrato',
-        'quantidade',
-        'requisitos',
-        'beneficios',
-        'origem',
-        'link',
+        'titulo', 'descricao', 'localizacao', 'modalidade', 'periodo',
+        'tipo_contrato', 'quantidade', 'requisitos', 'beneficios',
+        'origem', 'link', 'hash'
     ];
-
+    
     // Definindo os campos que devem ser tratados como timestamps
     public $timestamps = true;
 }

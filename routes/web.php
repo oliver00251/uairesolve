@@ -79,3 +79,4 @@ Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.upda
 Route::resource('vagas', VagaEmpregoController::class);
 
 
+Route::get('/vaga/{id}/gerar-imagem', [VagaEmpregoController::class, 'gerarImagem'])->name('gerar.imagem-vaga');
