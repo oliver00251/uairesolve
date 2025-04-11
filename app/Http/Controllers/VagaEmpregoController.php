@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\VagaEmprego;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Spatie\Browsershot\Browsershot;
+use Illuminate\Support\Str; 
+
 
 class VagaEmpregoController extends Controller
 {
@@ -109,4 +113,33 @@ class VagaEmpregoController extends Controller
 
         return redirect()->route('vagas.index')->with('success', 'Vaga de emprego deletada com sucesso!');
     }
+
+    public function gerarImagem($id)
+{
+    $vaga = VagaEmprego::findOrFail($id);
+
+    $nomeArquivo = 'vaga-' . Str::slug($vaga->titulo) . '-' . $vaga->id . '.png';
+    $caminhoPasta = storage_path('app/public/vagas');
+    $caminhoCompleto = $caminhoPasta . '/' . $nomeArquivo;
+
+    // ✅ Garante que a pasta existe
+    if (!File::exists($caminhoPasta)) {
+        File::makeDirectory($caminhoPasta, 0755, true);
+    }
+
+    // Geração
+    $browsershot = new Browsershot();
+    $browsershot->setNodeBinary('C:\Program Files\nodejs\node.exe');
+
+    $browsershot
+        ->html(view('vagas.imagem', compact('vaga'))->render())
+        ->windowSize(1080, 1080)
+        ->setScreenshotType('png')
+        ->deviceScaleFactor(2)
+        ->noSandbox()
+        ->timeout(60)
+        ->save($caminhoCompleto);
+
+    return response()->download($caminhoCompleto);
+}
 }

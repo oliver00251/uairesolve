@@ -68,6 +68,7 @@
                     <a href="{{ route('ocorrencias.gera.image', ['id' => $ocorrencia->id]) }}" class="btn btn-sm btn-outline-success" download>
                         Baixar imagem da postagem
                     </a>
+                    
                 @endif
 
                 <hr>

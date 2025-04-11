@@ -35,7 +35,6 @@ Route::get('auth/callback/google', [AuthController::class, 'handleGoogleCallback
 
 Route::get('/impacto', [ImpactoController::class, 'index'])->name('impacto.publico');
 
-
 # Ocorrencias
 Route::resource('ocorrencias', OcorrenciaController::class)->except(['show']);  // Excluímos a rota 'show' da resource para evitar conflito.
 Route::get('/ocorrencias/{filtro?}', [OcorrenciaController::class, 'index'])->name('ocorrencias.index');  // Listagem de ocorrências
@@ -77,8 +76,10 @@ Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.e
 
 Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
 
+Route::get('/vagas-imagem/{id}', [VagaEmpregoController::class, 'gerarImagem'])->name('gerar.imagem-vaga');
 
 Route::resource('vagas', VagaEmpregoController::class);
+
 
 
 
