@@ -6,9 +6,10 @@ use App\Models\VagaEmprego;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Spatie\Browsershot\Browsershot;
-use Illuminate\Support\Str; 
-
+use Illuminate\Support\Str;
+use Throwable;
 
 class VagaEmpregoController extends Controller
 {
@@ -116,25 +117,26 @@ class VagaEmpregoController extends Controller
     }
 
     public function gerarImagem($id)
-    {
+{
+    try {
         $vaga = VagaEmprego::findOrFail($id);
-    
+
         $nomeArquivo = 'vaga-' . Str::slug($vaga->titulo) . '-' . $vaga->id . '.png';
-    
+
         $caminhoPasta = App::environment('production')
             ? public_path('storage/vagas')
             : storage_path('app/public/vagas');
-    
+
         $caminhoCompleto = $caminhoPasta . '/' . $nomeArquivo;
-    
+
         if (!File::exists($caminhoPasta)) {
             File::makeDirectory($caminhoPasta, 0755, true);
         }
-    
+
         $nodePath = App::environment('production')
             ? '/home/u315703485/node-local/bin/node'
             : 'C:\Program Files\nodejs\node.exe';
-    
+
         $browsershot = new Browsershot();
         $browsershot
             ->setNodeBinary($nodePath)
@@ -145,9 +147,23 @@ class VagaEmpregoController extends Controller
             ->noSandbox()
             ->timeout(60)
             ->save($caminhoCompleto);
-    
+
         return response()->download($caminhoCompleto);
+    } catch (Throwable $e) {
+        // 🔥 LOGA no storage/logs/laravel.log
+        Log::error('Erro ao gerar imagem da vaga: ' . $e->getMessage(), [
+            'exception' => $e
+        ]);
+
+        // 🔍 Exibe pro navegador (pode tirar em produção)
+        return response()->json([
+            'erro' => true,
+            'mensagem' => $e->getMessage(),
+            'arquivo' => $e->getFile(),
+            'linha' => $e->getLine(),
+        ], 500);
     }
     
     
+}
 }
