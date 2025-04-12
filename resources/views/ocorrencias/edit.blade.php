@@ -15,9 +15,9 @@
                     </a>
                     <h2 class="ms-2 mb-0 fs-5 fs-md-3">Editar {{$ocorrencia->titulo}}</h2>
                 </div>
-
+                
                 {{-- Verificando se o usuário é o autor da ocorrência ou um administrador --}}
-                @if(Auth::check() && (Auth::user()->id === $ocorrencia->user_id || Auth::user()->is_admin))
+                @if(Auth::check() && (Auth::user()->id === $ocorrencia->user_id ||auth()->user()->tipo == 'admin'))
                     <form id="editOcorrenciaForm" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
