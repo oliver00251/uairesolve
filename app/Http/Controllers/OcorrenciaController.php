@@ -287,7 +287,7 @@ class OcorrenciaController extends Controller
     // Função para verificar se o usuário tem permissão
     private function hasPermission(Ocorrencia $ocorrencia)
     {
-        return $ocorrencia->user_id === auth()->id() || auth()->user()->is_admin;
+        return $ocorrencia->user_id === auth()->id() ||  auth()->user()->tipo === 'admin';
     }
 
     public function gerarImagem($id = 1)
