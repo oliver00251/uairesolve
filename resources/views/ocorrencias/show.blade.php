@@ -52,7 +52,7 @@
                 {{-- Ações --}}
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
 
-                    @if (Auth::check() && Auth::user()->id === $ocorrencia->user_id || auth()->user()->tipo == 'admin')
+                    @if (Auth::check() && (Auth::user()->id === $ocorrencia->user_id || Auth::user()->tipo == 'admin'))
                     
                         <a href="{{ route('ocorrencias.edit', $ocorrencia->id) }}" class="btn btn-sm btn-outline-primary">
                             <i class="fas fa-edit"></i> Editar
