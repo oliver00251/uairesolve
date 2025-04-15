@@ -125,6 +125,8 @@ class AuthController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
+        $usuariosAtivos = User::orderBy('name')->get(); 
+
 
         // Verifica se o usuário é admin
         $isAdmin = $user->tipo === 'admin';
