@@ -126,8 +126,6 @@ class AuthController extends Controller
     {
         $user = Auth::user();
         $usuariosAtivos = User::orderBy('name')->get(); 
-
-
         // Verifica se o usuário é admin
         $isAdmin = $user->tipo === 'admin';
 
@@ -165,6 +163,7 @@ class AuthController extends Controller
             'ocorrenciasComentadas',
             'ocorrencias',
             'totalOcorrencias',
+            'usuariosAtivos',
             'ocorrenciasAbertas',
             'ocorrenciasResolvidas',
             'ocorrenciasEmAndamento',

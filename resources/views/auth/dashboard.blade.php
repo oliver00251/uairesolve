@@ -70,6 +70,38 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="card shadow-lg border-0 rounded-3 col-md-12 mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">Usuários Ativos</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Email</th>
+                                            <th>Registrado em</th>
+                                            <th>Último Login</th> {{-- se tiver esse campo --}}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($usuariosAtivos as $usuario)
+                                            <tr>
+                                                <td>{{ $usuario->name }}</td>
+                                                <td>{{ $usuario->email }}</td>
+                                                <td>{{ $usuario->created_at->format('d/m/Y') }}</td>
+                                                <td>{{ optional($usuario->last_login_at)->format('d/m/Y H:i') ?? '---' }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4">Nenhum usuário ativo encontrado.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
                     @else
                     <!-- Para usuários comuns, mostrar apenas o título e a data -->
                     @if ($minhasOcorrencias->isEmpty() && $ocorrenciasComentadas->isEmpty())
