@@ -27,11 +27,7 @@
                     
                 </div>
                 @if (auth()->check() && auth()->user()->tipo == 'admin')
-                <pre>
-                    Tipo do usuário: {{ auth()->user()->tipo }}
-                    ID do usuário: {{ auth()->user()->id }}
-                    ID do dono da ocorrência: {{ $ocorrencia->user_id }}
-                    </pre>
+                
                 <a href="{{ route('gerar.imagem-vaga', ['id' => $vaga->id]) }}" class="btn btn-sm btn-outline-success" >
                     Baixar imagem da postagem
                 </a>
