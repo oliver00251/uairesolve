@@ -124,5 +124,10 @@
             });
         }
     </script>
+    <style>
+        .bg-info{
+            background: #0D6EFD !important;
+        }
+    </style>
 </body>
 </html>

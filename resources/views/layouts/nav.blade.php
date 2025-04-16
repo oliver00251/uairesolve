@@ -14,23 +14,23 @@
             <ul class="navbar-nav align-items-center gap-3">
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('ocorrencias.index') }}">
-                        <i class="fas fa-map-marker-alt text-primary"></i> Publicações
+                        <i class="text-primary"></i> Publicações
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('vagas.index') }}">
-                        <i class="fas fa-briefcase text-primary"></i> Vagas de Emprego
+                        <i class="text-primary"></i> Vagas de Emprego
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('impacto.publico') }}" class="nav-link">
-                        <i class="fas fa-chart-line text-primary"></i> Visualizar Métricas da Cidade 
+                        <i class="text-primary"></i> Dados da Cidade 
                     </a>
                 </li>
                 
                 <li class="nav-item">
                     <a class="nav-link" href="https://www.instagram.com/uairesolveoficial/" target="_blank">
-                        <i class="fab fa-instagram text-primary"></i> Fale Conosco
+                        <i class=" text-primary"></i> Fale Conosco
                     </a>
                 </li>
 

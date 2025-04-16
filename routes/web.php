@@ -6,6 +6,7 @@ use App\Http\Controllers\ImpactoController;
 use App\Http\Controllers\OcorrenciaController;
 use App\Http\Controllers\OcorrenciaLikeController;
 use App\Http\Controllers\ParceiroController;
+use App\Http\Controllers\ParticipanteController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\VagaEmpregoController;
 use Illuminate\Support\Facades\Route;
@@ -80,3 +81,5 @@ Route::resource('vagas', VagaEmpregoController::class);
 
 
 Route::get('/vaga/{id}/gerar-imagem', [VagaEmpregoController::class, 'gerarImagem'])->name('gerar.imagem-vaga');
+Route::post('/rede-comunitaria/cadastrar', [ParticipanteController::class, 'store'])->name('rede-comunitaria.cadastrar');
+Route::get('/rede-comunitaria', [ParticipanteController::class, 'index'])->name('rede-comunitaria.index');
