@@ -4,39 +4,43 @@
         <!-- Logo -->
         <a class="navbar-brand fw-bold text-primary" href="/">UaiResolve</a>
 
-        <!-- Botão hamburguer (só aparece no mobile) -->
-        <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu">
+        <!-- Botão hambúrguer (mobile) -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <!-- Menu desktop -->
-        <div class="collapse navbar-collapse justify-content-end d-none d-lg-flex" id="navbarNav">
+        <div class="collapse navbar-collapse justify-content-end d-none d-lg-flex">
             <ul class="navbar-nav align-items-center gap-3">
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('ocorrencias.index') }}">
-                        <i class="text-primary"></i> Publicações
+                        <i class="fas fa-map-marker-alt text-primary"></i> Publicações
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('vagas.index') }}">
-                        <i class="text-primary"></i> Vagas de Emprego
+                        <i class="fas fa-briefcase text-primary"></i> Vagas de Emprego
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('impacto.publico') }}" class="nav-link">
-                        <i class="text-primary"></i> Dados da Cidade 
+                    <a class="nav-link" href="{{ route('impacto.publico') }}">
+                        <i class="fas fa-chart-line text-primary"></i> Dados da Cidade
                     </a>
                 </li>
-                
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('rede-comunitaria.index') }}">
+                        <i class="fas fa-users text-primary"></i> Rede Comunitária
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="https://www.instagram.com/uairesolveoficial/" target="_blank">
-                        <i class=" text-primary"></i> Fale Conosco
+                        <i class="fab fa-instagram text-primary"></i> Fale Conosco
                     </a>
                 </li>
 
                 @auth
                 <li class="nav-item dropdown">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-outline-primary dropdown-toggle" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-user-circle"></i> {{ Auth::user()->name }}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
@@ -64,7 +68,7 @@
     </div>
 </nav>
 
-{{-- MENU MOBILE: Offcanvas lateral (só aparece no mobile) --}}
+{{-- MENU MOBILE (Offcanvas) --}}
 <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="mobileMenuLabel">Menu</h5>
@@ -77,26 +81,31 @@
         <a href="{{ route('vagas.index') }}" class="btn btn-primary w-100 rounded-pill">
             <i class="fas fa-briefcase"></i> Vagas de Emprego
         </a>
-       
-        <a href="https://www.instagram.com/uairesolveoficial/" class="btn btn-primary w-100 rounded-pill" target="_blank">
+        <a href="{{ route('impacto.publico') }}" class="btn btn-primary w-100 rounded-pill">
+            <i class="fas fa-chart-line"></i> Dados da Cidade
+        </a>
+        <a href="{{ route('rede-comunitaria.index') }}" class="btn btn-primary w-100 rounded-pill">
+            <i class="fas fa-users"></i> Rede Comunitária
+        </a>
+        <a href="https://www.instagram.com/uairesolveoficial/" target="_blank" class="btn btn-primary w-100 rounded-pill">
             <i class="fab fa-instagram"></i> Fale Conosco
         </a>
 
         @auth
-            <hr>
-            <a href="/dashboard" class="btn btn-outline-secondary w-100">
-                <i class="fas fa-user-circle"></i> {{ Auth::user()->name }}
-            </a>
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-outline-danger w-100">
-                    <i class="fas fa-sign-out-alt"></i> Sair
-                </button>
-            </form>
+        <hr>
+        <a href="/dashboard" class="btn btn-outline-secondary w-100">
+            <i class="fas fa-user-circle"></i> {{ Auth::user()->name }}
+        </a>
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="btn btn-outline-danger w-100">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        </form>
         @else
-            <a href="{{ route('login') }}" class="btn btn-outline-primary w-100">
-                <i class="fas fa-sign-in-alt"></i> Entrar
-            </a>
+        <a href="{{ route('login') }}" class="btn btn-outline-primary w-100">
+            <i class="fas fa-sign-in-alt"></i> Entrar
+        </a>
         @endauth
     </div>
 </div>
