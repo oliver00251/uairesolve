@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ocorrencia;
+use App\Models\Participante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -128,6 +129,8 @@ class AuthController extends Controller
         $usuariosAtivos = User::orderBy('name')->get(); 
         // Verifica se o usuário é admin
         $isAdmin = $user->tipo === 'admin';
+        $participantes = $isAdmin ? Participante::latest()->get() : collect();
+
 
         // Ocorrências para o usuário
         $minhasOcorrencias = Ocorrencia::where('user_id', $user->id)
@@ -163,6 +166,7 @@ class AuthController extends Controller
             'ocorrenciasComentadas',
             'ocorrencias',
             'totalOcorrencias',
+            'participantes',
             'usuariosAtivos',
             'ocorrenciasAbertas',
             'ocorrenciasResolvidas',
